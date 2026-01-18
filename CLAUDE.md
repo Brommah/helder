@@ -5,11 +5,12 @@
 |---|---|
 | **Project** | Woningpaspoort (Housing Passport) |
 | **Owner** | Martijn Broersma |
-| **Type** | Product Development |
+| **Type** | Construction Tech Platform |
 | **Status** | 🟡 In Development |
+| **Market** | Dutch construction industry (€5B annual loss from miscommunication) |
 
-### Description
-Digital housing passport system — a comprehensive platform for documenting, tracking, and sharing property information, certifications, and history.
+### Vision
+The **definitive digital lifecycle system** for buildings — capturing every detail from construction through decades of ownership. An immutable, cryptographically-secured database serving as the single source of truth for a property's entire history.
 
 ---
 
@@ -17,47 +18,145 @@ Digital housing passport system — a comprehensive platform for documenting, tr
 Extends `~/.claude/CLAUDE.md`. Personal context, communication preferences, and skills apply.
 
 **Project-specific overrides:**
-- More technical detail welcome (this is a product build)
-- Use Dutch terminology where appropriate for UI/UX discussions
-- Focus on MVP features first
+- This is an ambitious, complex product — think big but build incrementally
+- Integration with Cere's data vault technology is a key differentiator
+- Dutch regulatory compliance (Wkb law) is a core driver
+- Focus on both B2B (builders) and B2C (homeowners) experiences
 
 ---
 
-## Product Context
+## Product Vision
 
-### What We're Building
-A digital "paspoort" for residential properties that includes:
-- Property specifications and floor plans
-- Energy labels and sustainability certifications
-- Maintenance history and schedules
-- Ownership and transaction history
-- Connected IoT/smart home data (future)
+### The Problem
+- **€5 billion annual loss** in Dutch construction due to miscommunication
+- **19% average cost overruns** on projects
+- **Fragmented documentation**: WhatsApp, email, paper scattered everywhere
+- **Wkb law (Jan 2024)**: New Dutch quality assurance law requires 20-year document retention
+- **No single source of truth** for property history
 
-### Target Users
-1. **Homeowners** — Track their property, plan maintenance
-2. **Real estate agents** — Standardized property information
-3. **Municipalities** — Compliance and sustainability tracking
-4. **Buyers** — Due diligence before purchase
-
-### Key Differentiators
-- Single source of truth for property data
-- Integration with government databases (Kadaster, RVO)
-- Privacy-first: owner controls what's shared
-- Mobile-first experience
+### The Solution
+A comprehensive digital record system that captures:
+- Every material, contractor, and process used in construction
+- Real-time documentation via smart glasses + AI
+- Immutable, cryptographically-secured records
+- User-controlled data sharing with zero-knowledge proofs
+- Predictive AI for maintenance and improvements
 
 ---
 
-## Technical Stack (Proposed)
+## Core Components
 
+### 1. Construction Documentation
+| What We Capture | Details |
+|-----------------|---------|
+| **Materials** | Paint colors, brands, application dates, batch numbers |
+| **Processes** | Step-by-step phases with photo/video evidence |
+| **Weather** | Environmental conditions during each phase |
+| **Contractors** | Who did what, when, certifications, quality ratings |
+| **Compliance** | Permits, inspections, regulatory approvals |
+
+### 2. Smart Documentation System
+- **Smart glasses integration**: Real-time video recording of workdays
+- **AI frame analysis**: Automatic identification of materials and processes
+- **Zero manual input**: Administrative records generated automatically
+- **Human-in-the-loop**: QA when AI confidence is low
+
+### 3. Legal Compliance (Wkb)
+- 20-year retention periods
+- Real-time project tracking
+- Municipality oversight access (non-personal data)
+- Automated compliance reporting
+
+### 4. Data Security (Cere Integration)
+- **Individual encryption**: Each house timeline separately encrypted
+- **Zero-knowledge proofs**: Verification without exposing sensitive data
+- **User-controlled access**: Homeowners control all data sharing
+- **Immutable records**: Blockchain-style cryptographic verification
+
+### 5. AI-Powered Features ("Homey")
+- Predictive maintenance recommendations
+- Personalized improvement offers based on budget
+- Multi-year timeline planning (solar, extensions, renovations)
+- Specialist team guidance throughout lifecycle
+
+---
+
+## User Personas & Interfaces
+
+### Homeowners (B2C)
+**Experience:**
+- Mobile-first wizard: Design dream house in 3 minutes
+- Real-time construction progress tracking
+- Budget-based improvement timeline (2-3 year plans)
+- Complete transparency on all work and materials
+- "Homey" AI assistant for maintenance advice
+
+**Key screens:**
+- Dashboard: Property overview, upcoming maintenance
+- Timeline: Construction history, photo/video evidence
+- Planning: Future improvements with cost estimates
+- Sharing: Control who sees what data
+
+### Builders & Contractors (B2B)
+**Experience:**
+- Real-time construction operating system
+- Unified dashboard across all projects
+- Smart glasses integration for auto-documentation
+- Automated compliance reporting
+- Supply chain integration
+
+**Key screens:**
+- Project dashboard: All active builds
+- Documentation: Auto-captured evidence
+- Compliance: Permit status, inspection schedules
+- Team: Subcontractor coordination
+
+### Municipalities (B2G)
+**Experience:**
+- Non-personal workflow transparency
+- Real-time project oversight
+- Automated permit verification
+- Inspection scheduling integration
+
+---
+
+## Business Model
+
+### Revenue Streams
+| Stream | Description | Priority |
+|--------|-------------|----------|
+| **Builder SaaS** | Per-project or subscription for construction companies | P0 |
+| **Homeowner Freemium** | Free basic, premium for AI features | P1 |
+| **Data Marketplace** | Anonymized insights for insurance, banks | P2 |
+| **Municipality Licensing** | Compliance platform access | P2 |
+
+### Data Monetization (with user consent)
+- **Insurance**: Personalized rates based on actual construction quality
+- **Banks**: Enhanced lending decisions with complete property history
+- **Building companies**: Targeted offers for specific house configurations
+- **Maintenance services**: Predictive scheduling based on installed components
+
+---
+
+## Technical Architecture
+
+### Stack
 | Layer | Technology | Notes |
 |-------|------------|-------|
-| Frontend | Next.js 14+ / React | TypeScript, App Router |
-| Styling | Tailwind CSS | Mobile-first |
-| Backend | Node.js / tRPC | Type-safe API |
-| Database | PostgreSQL | Prisma ORM |
-| Auth | NextAuth.js | DigiD integration (future) |
-| Hosting | Vercel | Easy deployment |
-| Storage | S3/Cloudflare R2 | Documents, images |
+| **Frontend** | Next.js 14 / React Native | Web + Mobile |
+| **Backend** | Node.js / tRPC | Type-safe API |
+| **Database** | PostgreSQL + TimescaleDB | Relational + time-series |
+| **Storage** | Cere DDC / S3 | Decentralized + backup |
+| **Auth** | NextAuth + DigiD (future) | Dutch gov integration |
+| **AI/ML** | Python / FastAPI | Video analysis, predictions |
+| **Data Vault** | Cere Network | Individual encryption, ZK proofs |
+
+### Key Integrations
+- **Smart glasses**: RealWear, Vuzix (construction-grade)
+- **IoT sensors**: Temperature, humidity, energy monitoring
+- **Kadaster**: Dutch land registry
+- **RVO**: Energy label database
+- **BAG**: Building address registry
 
 ---
 
@@ -65,123 +164,72 @@ A digital "paspoort" for residential properties that includes:
 ```
 woningpaspoort/
 ├── CLAUDE.md                    ← You are here
-├── .github/workflows/           ← CI automation
-├── src/
-│   ├── app/                     ← Next.js app router
-│   ├── components/              ← React components
-│   ├── lib/                     ← Utilities, helpers
-│   ├── server/                  ← API routes, tRPC
-│   └── types/                   ← TypeScript types
-├── tests/                       ← Test files
-├── docs/                        ← Documentation
+├── apps/
+│   ├── web/                     ← Next.js homeowner app
+│   ├── builder/                 ← Next.js builder dashboard
+│   └── mobile/                  ← React Native app
+├── packages/
+│   ├── database/                ← Prisma schema, migrations
+│   ├── ai/                      ← ML models, video analysis
+│   ├── cere-sdk/                ← Data vault integration
+│   └── shared/                  ← Common types, utils
+├── services/
+│   ├── api/                     ← tRPC API server
+│   ├── ai-worker/               ← Video processing queue
+│   └── compliance/              ← Wkb reporting service
+├── docs/
 │   └── PRDs/                    ← Product requirements
-├── prisma/                      ← Database schema
-├── public/                      ← Static assets
-└── scripts/                     ← Utility scripts
+└── infrastructure/              ← Terraform, K8s configs
 ```
 
 ---
 
-## Development Standards
+## Development Phases
 
-### Code Style
-- **TypeScript:** Strict mode, no `any`
-- **React:** Functional components, hooks only
-- **Naming:** 
-  - Components: PascalCase (`PropertyCard.tsx`)
-  - Utilities: camelCase (`formatAddress.ts`)
-  - Types: PascalCase with `T` or `I` prefix optional
-- **Commits:** `feat|fix|chore|docs: <50 chars>`
+### Phase 1: MVP (Current Focus)
+- [ ] Homeowner onboarding wizard
+- [ ] Basic property profile creation
+- [ ] Document upload & organization
+- [ ] Simple sharing via secure links
+- [ ] Builder dashboard (manual entry)
 
-### Dutch vs English
-- **Code:** English (variables, functions, comments)
-- **UI text:** Dutch (user-facing strings)
-- **Documentation:** English (technical), Dutch (user docs)
+### Phase 2: Smart Documentation
+- [ ] Smart glasses SDK integration
+- [ ] AI video analysis pipeline
+- [ ] Automatic material recognition
+- [ ] Human-in-the-loop QA interface
 
-### Testing
-- **Unit:** Vitest for utilities and hooks
-- **Component:** React Testing Library
-- **E2E:** Playwright (future)
-- **Coverage target:** 80% for critical paths
-
-### Commands
-```bash
-# Development
-npm install
-npm run dev              # Start dev server (localhost:3000)
-
-# Quality
-npm run lint             # ESLint
-npm run lint:fix         # Auto-fix
-npm run typecheck        # TypeScript check
-npm test                 # Run tests
-npm run test:coverage    # With coverage
-
-# Database
-npm run db:push          # Push schema changes
-npm run db:studio        # Open Prisma Studio
-
-# Build
-npm run build            # Production build
-npm run start            # Start production server
-```
-
----
-
-## Tool Permissions
-
-### Allowed
-- ✅ Read/write any file in project
-- ✅ Run npm/pnpm commands
-- ✅ Run Prisma commands
-- ✅ Git read operations
-- ✅ Create components and pages
-
-### Ask First
-- ⚠️ Database schema changes (migrations)
-- ⚠️ Installing new dependencies
-- ⚠️ Modifying authentication logic
-- ⚠️ Changes to CI/CD
-
-### Never
-- ❌ Modify files outside project
-- ❌ Hardcode API keys or secrets
-- ❌ Delete database migrations
-- ❌ Push directly to main
-
----
-
-## MCP Configuration
-
-| MCP | Status | Use Case |
-|-----|--------|----------|
-| GitHub | ✅ Enable | Issues, PRs |
-| Notion | ✅ Enable | PRDs, documentation |
-| Lemlist | ❌ Disable | Not relevant |
-| Google Drive | ⚠️ As needed | Shared specs |
-
----
-
-## Feature Roadmap
-
-### MVP (Phase 1)
-- [ ] User authentication (email/password)
-- [ ] Property creation and basic info
-- [ ] Document upload (PDF, images)
-- [ ] Property dashboard view
-- [ ] Share property with link
-
-### Phase 2
-- [ ] Energy label integration
-- [ ] Maintenance scheduling
-- [ ] Multi-property support
-- [ ] Mobile app (React Native)
-
-### Phase 3
+### Phase 3: Compliance & Integrations
+- [ ] Wkb compliance reporting
+- [ ] Municipality portal
+- [ ] Kadaster/BAG integration
 - [ ] DigiD authentication
-- [ ] Kadaster integration
-- [ ] IoT device connections
-- [ ] Marketplace features
+
+### Phase 4: AI & Monetization
+- [ ] "Homey" AI assistant
+- [ ] Predictive maintenance
+- [ ] Data marketplace (anonymized)
+- [ ] Insurance/bank integrations
+
+---
+
+## Domain Terminology
+
+| Dutch | English | Context |
+|-------|---------|---------|
+| Woningpaspoort | Housing Passport | Product name |
+| Wkb | Quality Assurance Act | Jan 2024 law requiring documentation |
+| Kadaster | Land Registry | Property ownership records |
+| BAG | Building Address Registry | Official address database |
+| WOZ | Property Tax Value | Municipal valuation |
+| Bouwbesluit | Building Code | Construction regulations |
+| Oplevering | Handover | Project completion milestone |
+| Aannemer | Contractor | General contractor |
+| Onderaannemer | Subcontractor | Specialist trades |
+| Bouwdossier | Construction File | Traditional paper documentation |
+| Energielabel | Energy Label | A-G rating |
+| Vergunning | Permit | Building permit |
+| Keuring | Inspection | Compliance check |
 
 ---
 
@@ -189,74 +237,76 @@ npm run start            # Start production server
 
 | Decision | Reasoning | Date |
 |----------|-----------|------|
-| Next.js over plain React | SSR, App Router, Vercel integration | 2026-01 |
-| PostgreSQL over MongoDB | Relational data, better for property records | 2026-01 |
-| Prisma ORM | Type-safe, great DX, migrations | 2026-01 |
-| Dutch UI, English code | Local market, international team potential | 2026-01 |
+| Cere for data vaults | Individual encryption, ZK proofs, Martijn's company | 2026-01 |
+| Monorepo structure | Multiple apps share code, easier maintenance | 2026-01 |
+| tRPC over REST | Type-safe API, excellent DX with TypeScript | 2026-01 |
+| TimescaleDB for time-series | Construction timeline data, efficient queries | 2026-01 |
+| Smart glasses first (vs phone) | Hands-free for construction workers | 2026-01 |
 
 ---
 
-## Domain Terminology
+## Development Standards
 
-| Dutch | English | Description |
-|-------|---------|-------------|
-| Woningpaspoort | Housing Passport | The product name |
-| Eigenaar | Owner | Property owner |
-| Woning | Property/Home | Residential property |
-| Energielabel | Energy Label | A-G rating |
-| Kadaster | Land Registry | Dutch property registry |
-| WOZ-waarde | Property Tax Value | Municipal valuation |
-| VvE | HOA | Homeowners association |
-| Onderhoud | Maintenance | Property maintenance |
-| Bouwjaar | Year Built | Construction year |
+### Code Style
+- **TypeScript:** Strict mode, no `any`, explicit return types
+- **React:** Functional components, hooks, server components where possible
+- **Naming:** English code, Dutch UI text
+- **Commits:** `feat|fix|chore|docs: <50 chars>`
 
----
+### Testing
+- Unit: Vitest
+- Component: React Testing Library
+- E2E: Playwright
+- AI: Golden dataset validation
 
-## Common Tasks
-
-### Adding a New Feature
-1. Create/update PRD in `docs/PRDs/`
-2. Create branch: `git checkout -b feat/feature-name`
-3. Write failing tests first
-4. Implement components and API
-5. Run full test suite
-6. Create PR with description
-
-### Adding a New Page
+### Commands
 ```bash
-# Create page file
-touch src/app/[route]/page.tsx
+# Development (from root)
+pnpm install
+pnpm dev                 # All apps
+pnpm dev:web             # Homeowner app only
+pnpm dev:builder         # Builder app only
 
-# Follow pattern:
-# - Server component by default
-# - 'use client' only when needed
-# - Metadata export for SEO
+# Quality
+pnpm lint
+pnpm typecheck
+pnpm test
+
+# Database
+pnpm db:push
+pnpm db:studio
+pnpm db:seed
 ```
 
-### Database Changes
-1. Update `prisma/schema.prisma`
-2. Run `npm run db:push` (dev) or create migration
-3. Update types: `npm run db:generate`
-4. Test with `npm run db:studio`
+---
+
+## Tool Permissions
+
+### Allowed
+- ✅ Read/write project files
+- ✅ Run pnpm/npm commands
+- ✅ Database operations (dev)
+- ✅ Git read operations
+
+### Ask First
+- ⚠️ Schema changes (affects multiple services)
+- ⚠️ New dependencies
+- ⚠️ CI/CD modifications
+- ⚠️ Infrastructure changes
+
+### Never
+- ❌ Modify Cere SDK internals
+- ❌ Expose API keys
+- ❌ Delete migrations
+- ❌ Push to main
 
 ---
 
-## Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| Port 3000 in use | `lsof -i :3000` then `kill -9 <PID>` |
-| Prisma types outdated | `npm run db:generate` |
-| Hydration mismatch | Check for 'use client' directive |
-| Build fails on Vercel | Check env vars in dashboard |
+## Related Resources
+- PRD: `docs/PRDs/woningpaspoort-mvp.md`
+- Cere docs: Internal
+- Wkb law: [Rijksoverheid](https://www.rijksoverheid.nl/onderwerpen/bouwregelgeving/wet-kwaliteitsborging-voor-het-bouwen)
 
 ---
 
-## Related Documents
-- PRDs: `docs/PRDs/`
-- Design: [Figma link TBD]
-- API Spec: `docs/api.md`
-
----
-
-*v1.0 | Created: 2026-01-18*
+*v2.0 | Updated: 2026-01-18 | Reflects full product vision*
