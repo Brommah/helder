@@ -1,0 +1,146 @@
+# Claude Code CI Automation - Woningpaspoort
+# PR review and security scanning
+
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task for Claude to perform'
+        required: true
+        default: 'Review the codebase for potential improvements'
+        type: string
+
+concurrency:
+  group: claude-review-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  pr-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      
+      - name: Get changed files
+        id: changed
+        run: |
+          FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | head -20)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Get diff
+        id: diff
+        run: |
+          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.prisma' | head -500)
+          echo "diff<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIFF" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Claude Code Review
+        id: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          REVIEW=$(claude -p "Review this PR for the Woningpaspoort project (Dutch housing passport app).
+
+          Check for:
+          1. **TypeScript:** Strict types, no 'any', proper null handling
+          2. **React:** Hooks rules, proper component patterns
+          3. **Security:** No exposed secrets, proper auth checks
+          4. **Dutch UI:** User-facing text should be Dutch
+          5. **Performance:** Unnecessary re-renders, N+1 queries
+
+          Format:
+          - **Summary:** One paragraph
+          - **Issues:** Bullet list (if any)
+          - **Suggestions:** Improvements (optional)
+          - **Verdict:** APPROVE / REQUEST_CHANGES / COMMENT
+
+          Changed files:
+          ${{ steps.changed.outputs.files }}
+
+          Diff:
+          ${{ steps.diff.outputs.diff }}" --max-turns 1 --no-permissions)
+          
+          REVIEW="${REVIEW//'%'/'%25'}"
+          REVIEW="${REVIEW//$'\n'/'%0A'}"
+          REVIEW="${REVIEW//$'\r'/'%0D'}"
+          echo "review=$REVIEW" >> $GITHUB_OUTPUT
+      
+      - name: Post review comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const review = decodeURIComponent(`${{ steps.review.outputs.review }}`
+              .replace(/%0A/g, '\n')
+              .replace(/%0D/g, '\r')
+              .replace(/%25/g, '%'));
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🏠 Woningpaspoort Code Review\n\n${review}\n\n---\n*Automated review by Claude Code*`
+            });
+
+  security-scan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      
+      - name: Security Analysis
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "Security scan for Woningpaspoort (housing data app - sensitive personal info).
+          
+          CRITICAL checks:
+          - Exposed API keys, database URLs, secrets
+          - Auth bypass vulnerabilities
+          - SQL injection in Prisma queries
+          - XSS in React components
+          - Exposed personal data (addresses, owner info)
+          - Missing authorization checks on API routes
+          
+          Output format:
+          - 🔴 CRITICAL: [issue] - [file:line]
+          - 🟡 WARNING: [issue] - [file:line]
+          
+          If clean: '✅ No security issues detected'" \
+          --max-turns 1 \
+          --no-permissions

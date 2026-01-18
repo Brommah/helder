@@ -1,0 +1,226 @@
+// Woningpaspoort Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Authentication
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts   Account[]
+  sessions   Session[]
+  properties Property[]
+  documents  Document[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// Core Domain: Woningen (Properties)
+// ============================================
+
+model Property {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Basic Info
+  address      String
+  postcode     String
+  city         String
+  houseNumber  String
+  houseNumberAddition String?
+  
+  // Property Details
+  propertyType PropertyType
+  bouwjaar     Int?          // Year built
+  woonoppervlakte Int?       // Living area in m²
+  perceeloppervlakte Int?    // Plot area in m²
+  kamers       Int?          // Number of rooms
+  
+  // Energy & Sustainability
+  energielabel EnergyLabel?
+  energielabelExpiry DateTime?
+  
+  // Valuation
+  wozWaarde    Decimal?      // WOZ value
+  wozYear      Int?
+  
+  // Cadastral
+  kadasterNumber String?
+  
+  // Relations
+  ownerId    String
+  owner      User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  documents  Document[]
+  maintenanceRecords MaintenanceRecord[]
+  shares     PropertyShare[]
+
+  @@index([ownerId])
+  @@index([postcode])
+}
+
+enum PropertyType {
+  APPARTEMENT
+  TUSSENWONING
+  HOEKWONING
+  TWEE_ONDER_EEN_KAP
+  VRIJSTAAND
+  BUNGALOW
+  WOONBOERDERIJ
+  OTHER
+}
+
+enum EnergyLabel {
+  A_PLUS_PLUS_PLUS
+  A_PLUS_PLUS
+  A_PLUS
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+}
+
+// ============================================
+// Documents
+// ============================================
+
+model Document {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  description String?
+  type        DocumentType
+  fileUrl     String
+  fileSize    Int
+  mimeType    String
+
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  uploadedById String
+  uploadedBy   User @relation(fields: [uploadedById], references: [id])
+
+  @@index([propertyId])
+  @@index([type])
+}
+
+enum DocumentType {
+  FLOOR_PLAN        // Plattegrond
+  ENERGY_LABEL      // Energielabel
+  DEED              // Akte
+  PERMIT            // Vergunning
+  MAINTENANCE       // Onderhoudsrapport
+  INSPECTION        // Keuring
+  INSURANCE         // Verzekering
+  HOA               // VvE documenten
+  PHOTO             // Foto
+  OTHER
+}
+
+// ============================================
+// Maintenance
+// ============================================
+
+model MaintenanceRecord {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String
+  description String?
+  category    MaintenanceCategory
+  cost        Decimal?
+  performedAt DateTime
+  performedBy String?
+  nextDueDate DateTime?
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([category])
+}
+
+enum MaintenanceCategory {
+  DACH           // Roof
+  GEVEL          // Facade
+  KOZIJNEN       // Window frames
+  CV_KETEL       // Heating system
+  SANITAIR       // Plumbing
+  ELEKTRA        // Electrical
+  TUIN           // Garden
+  ALGEMEEN       // General
+}
+
+// ============================================
+// Sharing
+// ============================================
+
+model PropertyShare {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  shareToken String @unique
+  accessLevel ShareAccessLevel
+  
+  // Optional: restrict to email
+  allowedEmail String?
+
+  @@index([shareToken])
+}
+
+enum ShareAccessLevel {
+  VIEW_BASIC    // Basic info only
+  VIEW_FULL     // All info
+  VIEW_DOCS     // Info + documents
+}
