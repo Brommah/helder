@@ -3,12 +3,12 @@
  * Creates demo users and sample data for development
  */
 
-import { PrismaClient, UserRole, PropertyType, EnergyLabel } from '@prisma/client'
+import { PrismaClient, UserRole, PropertyType, PropertyStatus, EnergyLabel, ConstructionPhase } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-const TEST_PASSWORD = 'Test123!'
+const TEST_PASSWORD = 'Demo1234!'
 
 async function main() {
   console.log('🌱 Seeding database...')
@@ -16,26 +16,119 @@ async function main() {
   // Hash password for all test users
   const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 12)
 
-  // Create demo homeowner
-  const demoUser = await prisma.user.upsert({
-    where: { email: 'demo@woningpaspoort.nl' },
-    update: {},
+  // ========================================
+  // ACCOUNT 1: Completed home (AI Active)
+  // ========================================
+  const completedUser = await prisma.user.upsert({
+    where: { email: 'completed@helder.nl' },
+    update: { password: hashedPassword },
     create: {
-      id: 'demo-user-1',
-      email: 'demo@woningpaspoort.nl',
-      name: 'Familie Van der Berg',
+      id: 'user-completed-1',
+      email: 'completed@helder.nl',
+      name: 'Familie De Vries',
       password: hashedPassword,
       role: UserRole.HOMEOWNER,
       emailVerified: new Date(),
       termsAcceptedAt: new Date(),
     },
   })
-  console.log('✅ Created demo homeowner:', demoUser.email)
+  console.log('✅ Created completed home owner:', completedUser.email)
+
+  // Completed property - AI is active
+  const completedProperty = await prisma.property.upsert({
+    where: { id: 'property-completed-1' },
+    update: {},
+    create: {
+      id: 'property-completed-1',
+      name: 'Villa Zonneweide',
+      street: 'Zonneweidelaan',
+      houseNumber: '12',
+      postcode: '1358 AB',
+      city: 'Almere Haven',
+      propertyType: PropertyType.VILLA,
+      bouwjaar: 2025,
+      woonoppervlakte: 210,
+      perceelOppervlakte: 580,
+      aantalKamers: 7,
+      aantalVerdiepingen: 2,
+      energielabel: EnergyLabel.A_PLUS_PLUS_PLUS_PLUS,
+      isNieuwbouw: true,
+      status: PropertyStatus.ACTIVE,
+      verificationBadge: true,
+      wozWaarde: 685000,
+      wozYear: 2025,
+      ownerId: completedUser.id,
+    },
+  })
+  console.log('✅ Created completed property:', completedProperty.name)
+
+  // ========================================
+  // ACCOUNT 2: Building home (AI Disabled)
+  // ========================================
+  const buildingUser = await prisma.user.upsert({
+    where: { email: 'building@helder.nl' },
+    update: { password: hashedPassword },
+    create: {
+      id: 'user-building-1',
+      email: 'building@helder.nl',
+      name: 'Familie Janssen',
+      password: hashedPassword,
+      role: UserRole.HOMEOWNER,
+      emailVerified: new Date(),
+      termsAcceptedAt: new Date(),
+    },
+  })
+  console.log('✅ Created building home owner:', buildingUser.email)
+
+  // Under construction property - AI is disabled
+  const buildingProperty = await prisma.property.upsert({
+    where: { id: 'property-building-1' },
+    update: {},
+    create: {
+      id: 'property-building-1',
+      name: 'Kavel 24 - De Buitenplaats',
+      kavelNumber: '24',
+      projectName: 'Woonwijk De Buitenplaats',
+      postcode: '1356 XX',
+      city: 'Almere Poort',
+      propertyType: PropertyType.VRIJSTAAND,
+      woonoppervlakte: 175,
+      perceelOppervlakte: 420,
+      aantalKamers: 5,
+      aantalVerdiepingen: 2,
+      isNieuwbouw: true,
+      status: PropertyStatus.UNDER_CONSTRUCTION,
+      currentPhase: ConstructionPhase.DAK_GEVEL,
+      startDate: new Date('2025-06-01'),
+      expectedEnd: new Date('2026-08-01'),
+      verificationBadge: false,
+      ownerId: buildingUser.id,
+    },
+  })
+  console.log('✅ Created building property:', buildingProperty.name)
+
+  // ========================================
+  // LEGACY: Keep old demo user for backwards compatibility
+  // ========================================
+  const demoUser = await prisma.user.upsert({
+    where: { email: 'demo@woningpaspoort.nl' },
+    update: { password: hashedPassword },
+    create: {
+      id: 'demo-user-1',
+      email: 'demo@woningpaspoort.nl',
+      name: 'Demo Gebruiker',
+      password: hashedPassword,
+      role: UserRole.HOMEOWNER,
+      emailVerified: new Date(),
+      termsAcceptedAt: new Date(),
+    },
+  })
+  console.log('✅ Created legacy demo user:', demoUser.email)
 
   // Create demo builder
   const demoBuilder = await prisma.user.upsert({
     where: { email: 'builder@woningpaspoort.nl' },
-    update: {},
+    update: { password: hashedPassword },
     create: {
       id: 'demo-builder-1',
       email: 'builder@woningpaspoort.nl',
@@ -51,7 +144,7 @@ async function main() {
   // Create admin user
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@woningpaspoort.nl' },
-    update: {},
+    update: { password: hashedPassword },
     create: {
       id: 'admin-user-1',
       email: 'admin@woningpaspoort.nl',
@@ -64,40 +157,23 @@ async function main() {
   })
   console.log('✅ Created admin user:', adminUser.email)
 
-  // Create a sample property for the demo user
-  const sampleProperty = await prisma.property.upsert({
-    where: { id: 'demo-property-1' },
-    update: {},
-    create: {
-      id: 'demo-property-1',
-      name: 'Villa Zonneweide',
-      street: 'Zonnebloemlaan',
-      houseNumber: '42',
-      postcode: '1234 AB',
-      city: 'Amsterdam',
-      propertyType: PropertyType.VRIJSTAAND,
-      bouwjaar: 2024,
-      woonoppervlakte: 185,
-      perceelOppervlakte: 450,
-      aantalKamers: 6,
-      aantalVerdiepingen: 2,
-      energielabel: EnergyLabel.A_PLUS_PLUS,
-      isNieuwbouw: true,
-      ownerId: demoUser.id,
-    },
-  })
-  console.log('✅ Created sample property:', sampleProperty.name)
-
   console.log('')
   console.log('🎉 Seeding complete!')
   console.log('')
   console.log('📋 Test Login Credentials:')
-  console.log('─────────────────────────────────────')
-  console.log('Homeowner:  demo@woningpaspoort.nl')
-  console.log('Builder:    builder@woningpaspoort.nl')
-  console.log('Admin:      admin@woningpaspoort.nl')
-  console.log('Password:   Test123!')
-  console.log('─────────────────────────────────────')
+  console.log('═══════════════════════════════════════════════════')
+  console.log('')
+  console.log('🏠 COMPLETED HOME (AI Active):')
+  console.log('   Email:    completed@helder.nl')
+  console.log('   Password: Demo1234!')
+  console.log('   → Villa Zonneweide - Opgeleverd, AI actief')
+  console.log('')
+  console.log('🏗️  BUILDING HOME (AI Disabled):')
+  console.log('   Email:    building@helder.nl')
+  console.log('   Password: Demo1234!')
+  console.log('   → Kavel 24 - In aanbouw, AI nog niet beschikbaar')
+  console.log('')
+  console.log('═══════════════════════════════════════════════════')
 }
 
 main()

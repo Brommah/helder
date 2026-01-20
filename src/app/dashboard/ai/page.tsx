@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { useProperty } from '../layout'
 import { 
   Brain, AlertTriangle, TrendingUp, Zap, Bell, Shield,
   ThermometerSun, Wrench, PiggyBank, Leaf, CheckCircle2,
   ArrowRight, BarChart3, Lightbulb, Activity, Calendar,
   ChevronRight, Clock, Target, Sparkles, LineChart,
-  Home, Droplets, Wind, Flame, Sun, Battery
+  Home, Droplets, Wind, Flame, Sun, Battery, Lock, HardHat
 } from 'lucide-react'
 
 // Animated counter hook
@@ -205,9 +206,75 @@ const INVESTMENT_ROI = [
 ]
 
 export default function AIDashboardPage() {
+  const property = useProperty()
   const { count: savingsCount, ref: savingsRef } = useCounter(5640)
   const { count: lifetimeCount, ref: lifetimeRef } = useCounter(112800)
   const [selectedComponent, setSelectedComponent] = useState(COMPONENT_HEALTH[0])
+
+  // Show locked state if property is not completed
+  if (!property?.isCompleted) {
+    return (
+      <div className="min-h-screen">
+        <div className="p-6 lg:p-8">
+          <div className="bg-slate-900 p-8 lg:p-12">
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="w-24 h-24 bg-white/10 mx-auto mb-8 flex items-center justify-center">
+                <Lock className="w-12 h-12 text-white/30" />
+              </div>
+              <h1 className="text-3xl lg:text-4xl font-black text-white mb-4">
+                AI INTELLIGENCE
+              </h1>
+              <p className="text-lg text-white/50 mb-8">
+                Beschikbaar na oplevering van uw woning
+              </p>
+              
+              <div className="bg-white/5 p-8 mb-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <HardHat className="w-8 h-8 text-[#93b9e6]" />
+                  <div className="text-left">
+                    <p className="font-black text-white">Woning in aanbouw</p>
+                    <p className="text-white/50 text-sm">Voortgang: {property?.progress || 0}%</p>
+                  </div>
+                </div>
+                <div className="h-2 bg-white/10 overflow-hidden mb-4">
+                  <div 
+                    className="h-full bg-[#93b9e6] transition-all"
+                    style={{ width: `${property?.progress || 0}%` }}
+                  />
+                </div>
+                <p className="text-white/40 text-sm">
+                  Na oplevering activeert het AI-systeem automatisch en ontvangt u 
+                  voorspellend onderhoud, energietips en slimme meldingen.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  { icon: Brain, label: 'Voorspellend onderhoud' },
+                  { icon: Zap, label: 'Energie optimalisatie' },
+                  { icon: Bell, label: 'Slimme meldingen' },
+                  { icon: TrendingUp, label: '€5.640 besparing/jaar' },
+                ].map((feature) => (
+                  <div key={feature.label} className="bg-white/5 p-4 flex items-center gap-3">
+                    <feature.icon className="w-5 h-5 text-white/30" />
+                    <span className="text-white/50 text-sm">{feature.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-[#93b9e6] text-slate-900 font-black uppercase tracking-wider hover:bg-white transition-colors"
+              >
+                Terug naar overzicht
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">
