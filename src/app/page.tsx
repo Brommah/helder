@@ -154,10 +154,10 @@ function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-slate-50/80 to-transparent" />
       </div>
 
-      <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12 pt-20">
+      <div className="relative max-w-[1600px] mx-auto px-6 lg:px-12 pt-24">
         <SectionLabel>SINDS 1956</SectionLabel>
 
-        <h1 className="text-[2.5rem] sm:text-[3.5rem] lg:text-[5rem] xl:text-[6rem] font-black text-slate-900 leading-[0.9] tracking-[-0.03em] mb-4">
+        <h1 className="text-[3rem] sm:text-[4.5rem] lg:text-[6.5rem] xl:text-[8rem] font-black text-slate-900 leading-[0.9] tracking-[-0.03em] mb-6">
           BOUW
           <br />
           <span className="text-[#93b9e6]">
@@ -167,41 +167,41 @@ function HeroSection() {
           BOUW DNA.
         </h1>
 
-        <p className="text-base lg:text-lg text-slate-500 max-w-md mb-6 font-light">
+        <p className="text-lg lg:text-xl text-slate-500 max-w-lg mb-8 font-light">
           Uw droomhuis verdient meer dan een sleutel. Het verdient een compleet 
           Woningpaspoort — elk materiaal, elke keuze, elke garantie.
         </p>
 
         {/* Key stats */}
-        <div className="flex flex-wrap items-end gap-6 lg:gap-10 mb-8">
+        <div className="flex flex-wrap items-end gap-8 lg:gap-12 mb-10">
           <div>
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#93b9e6] tracking-tight">19K+</div>
-            <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">PROJECTEN</div>
+            <div className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#93b9e6] tracking-tight">19K+</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">PROJECTEN</div>
           </div>
           <div>
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">68</div>
-            <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">JAAR ERVARING</div>
+            <div className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight">68</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">JAAR ERVARING</div>
           </div>
           <div>
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-300 tracking-tight">100%</div>
-            <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">TRANSPARANTIE</div>
+            <div className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-300 tracking-tight">100%</div>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">TRANSPARANTIE</div>
           </div>
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/assessment"
-            className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-slate-900 text-white text-sm font-black uppercase tracking-[0.1em] hover:bg-[#93b9e6] transition-colors duration-300"
+            className="group inline-flex items-center justify-center gap-3 px-10 py-5 bg-slate-900 text-white text-base font-black uppercase tracking-[0.1em] hover:bg-[#93b9e6] transition-colors duration-300"
           >
             ONTDEK OF BOUWEN PAST
             <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
           </Link>
           <Link
             href="/woningpaspoort"
-            className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-transparent text-slate-900 text-sm font-black uppercase tracking-[0.1em] border-2 border-slate-200 hover:border-[#93b9e6] hover:text-[#93b9e6] transition-all duration-300"
+            className="group inline-flex items-center justify-center gap-3 px-10 py-5 bg-transparent text-slate-900 text-base font-black uppercase tracking-[0.1em] border-2 border-slate-200 hover:border-[#93b9e6] hover:text-[#93b9e6] transition-all duration-300"
           >
-            <Shield className="w-4 h-4" />
+            <Shield className="w-5 h-5" />
             WONINGPASPOORT
           </Link>
         </div>
