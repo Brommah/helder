@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================
@@ -17,12 +18,17 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
+  password      String?   // Hashed password for credentials auth
   name          String?
   emailVerified DateTime?
   image         String?
+  phone         String?
   role          UserRole  @default(HOMEOWNER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  // Terms acceptance (Wkb disclaimer)
+  termsAcceptedAt DateTime?
 
   // Relations
   accounts      Account[]
@@ -127,18 +133,26 @@ model Property {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Address
-  street          String
-  houseNumber     String
+  // Name (user-defined)
+  name            String?           // "Villa Zonneweide"
+
+  // Address (standard format)
+  street          String?
+  houseNumber     String?
   houseNumberAdd  String?
-  postcode        String
+  postcode        String?
   city            String
   country         String   @default("NL")
-  
+
+  // Kavel address (for nieuwbouw - address may not exist yet)
+  kavelNumber     String?           // "Kavel 12"
+  projectName     String?           // "Woonwijk De Buitenplaats"
+  isNieuwbouw     Boolean  @default(false)
+
   // Cadastral
   kadasterNumber  String?  // e.g., "ASD01 A 1234"
   bagId           String?  // BAG identification
-  
+
   // Property Details
   propertyType    PropertyType
   bouwjaar        Int?              // Year built
@@ -147,18 +161,27 @@ model Property {
   inhoud          Int?              // Volume m³
   aantalKamers    Int?              // Number of rooms
   aantalVerdiepingen Int?           // Number of floors
-  
+
+  // Construction Timeline (for nieuwbouw)
+  startDate       DateTime?         // Project start
+  expectedEnd     DateTime?         // Expected completion
+  currentPhase    ConstructionPhase?
+
   // Energy
   energielabel        EnergyLabel?
   energielabelDate    DateTime?
   energielabelExpiry  DateTime?
-  
+
   // Valuation
   wozWaarde       Decimal?
   wozYear         Int?
   koopsom         Decimal?          // Purchase price
   koopDatum       DateTime?         // Purchase date
-  
+
+  // Verification badge
+  verificationBadge Boolean @default(false)
+  cereVaultId       String?
+
   // Status
   status          PropertyStatus @default(ACTIVE)
 
@@ -172,6 +195,7 @@ model Property {
   maintenance     MaintenanceRecord[]
   shares          PropertyShare[]
   projects        Project[]
+  costs           CostBreakdown[]
 
   @@index([ownerId])
   @@index([postcode])
@@ -202,6 +226,50 @@ enum PropertyStatus {
   FOR_SALE
   SOLD
   ARCHIVED
+}
+
+enum ConstructionPhase {
+  GRONDWERK      // Foundation work
+  RUWBOUW        // Shell/structure
+  DAK_GEVEL      // Roof & facade
+  INSTALLATIES   // Installations (E/W/HVAC)
+  AFBOUW         // Finishing
+  OPLEVERING     // Handover
+}
+
+// ============================================
+// Cost Breakdown (Budget vs Actuals)
+// ============================================
+
+model CostBreakdown {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    CostCategory
+  description String?
+  budgeted    Decimal
+  actual      Decimal  @default(0)
+
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, category])
+  @@index([propertyId])
+}
+
+enum CostCategory {
+  KAVEL           // Plot/land
+  FOUNDATION      // Fundering
+  STRUCTURE       // Ruwbouw
+  ROOF_FACADE     // Dak & gevel
+  INSTALLATIONS   // Installaties
+  FINISHING       // Afbouw
+  KITCHEN         // Keuken
+  BATHROOM        // Badkamer
+  GARDEN          // Tuin
+  FEES            // Leges, notaris, etc.
+  OTHER           // Overig
 }
 
 enum EnergyLabel {

@@ -1,0 +1,35 @@
+# Agent OS Configuration for Woningpaspoort
+# Configured for Cursor AI coding tool
+
+defaults:
+  profile: woningpaspoort
+  
+  # Cursor setup - use agent_os_commands for @ references
+  claude_code_commands: false
+  use_claude_code_subagents: false
+  agent_os_commands: true
+  standards_as_claude_code_skills: false
+
+project:
+  name: Woningpaspoort
+  description: Digital housing passport for nieuwbouw - capturing complete housing DNA
+  type: web-application
+  stack:
+    - Next.js 14
+    - TypeScript
+    - Prisma
+    - tRPC
+    - Tailwind CSS
+    - Cere Network (blockchain)
+  
+  target_segment: "Nieuwbouw families, €400K-700K, kavels"
+  
+  key_differentiators:
+    wedge: "Wkb compliance - mandatory since Jan 2024"
+    moat: "Complete housing DNA from first pile to handover"
+    security: "Cere Network blockchain verification"
+
+workflow:
+  verification: true
+  visuals: true
+  auto_tasks: false

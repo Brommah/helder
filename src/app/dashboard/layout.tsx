@@ -1,7 +1,248 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { useSession, signOut } from 'next-auth/react'
+import { Logo } from '@/components/ui/logo'
+import {
+  Home, Clock, FileText, Package, Share2, Settings, LogOut,
+  Menu, X, ChevronRight, Bell, Shield, HelpCircle, Sparkles, Loader2, Euro
+} from 'lucide-react'
+
+const NAVIGATION = [
+  { href: '/dashboard' as const, icon: Home, label: 'OVERZICHT', exact: true },
+  { href: '/dashboard/timeline' as const, icon: Clock, label: 'TIJDLIJN' },
+  { href: '/dashboard/documents' as const, icon: FileText, label: 'DOCUMENTEN' },
+  { href: '/dashboard/costs' as const, icon: Euro, label: 'KOSTEN' },
+  { href: '/dashboard/share' as const, icon: Share2, label: 'DELEN' },
+]
+
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return children
+  const pathname = usePathname()
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const isActive = (href: string, exact?: boolean) => {
+    if (exact) return pathname === href
+    return pathname.startsWith(href)
+  }
+
+  // Show loading state while checking auth
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#93b9e6] mx-auto mb-4" />
+          <p className="text-slate-500 text-sm font-bold uppercase tracking-wider">Laden...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Redirect to login if not authenticated
+  if (status === 'unauthenticated') {
+    router.push('/auth/login?callbackUrl=/dashboard')
+    return null
+  }
+
+  const userInitials = session?.user?.name
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || 'U'
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' })
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Subtle grid background */}
+      <div className="fixed inset-0 opacity-[0.02] pointer-events-none" style={{
+        backgroundImage: `linear-gradient(#93b9e6 1px, transparent 1px), linear-gradient(90deg, #93b9e6 1px, transparent 1px)`,
+        backgroundSize: '60px 60px'
+      }} />
+
+      {/* Mobile header */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-200">
+        <div className="flex items-center justify-between px-4 h-16">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 hover:bg-slate-100 transition-colors"
+          >
+            <Menu className="w-6 h-6 text-slate-600" />
+          </button>
+          
+          <Logo size="sm" href="/dashboard" />
+
+          <button className="p-2 hover:bg-slate-100 transition-colors relative">
+            <Bell className="w-6 h-6 text-slate-600" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#93b9e6]" />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 z-50 bg-black/50"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed top-0 bottom-0 left-0 z-50 w-72 bg-slate-900
+        transform transition-transform duration-300 ease-out
+        lg:translate-x-0
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <Link href="/dashboard" className="flex items-center gap-3">
+              <Logo size="md" href="/dashboard" />
+            </Link>
+            <button 
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-2 hover:bg-white/10 transition-colors"
+            >
+              <X className="w-5 h-5 text-white/50" />
+            </button>
+          </div>
+
+          {/* Property Card */}
+          <div className="p-4">
+            <div className="bg-[#93b9e6] p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
+                  <Home className="w-6 h-6 text-slate-900" />
+                </div>
+                <div>
+                  <p className="font-black text-slate-900 text-sm">VILLA ZONNEWEIDE</p>
+                  <p className="text-xs text-slate-900/60 font-medium">Kavel 12, Nieuwbouw</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-1 bg-slate-900/20 overflow-hidden">
+                  <div className="h-full w-3/4 bg-slate-900" />
+                </div>
+                <span className="text-xs font-black text-slate-900">75%</span>
+              </div>
+              <p className="text-[10px] text-slate-900/50 mt-2 font-bold uppercase tracking-wider">Ruwbouw afgerond</p>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-4 py-2 overflow-y-auto">
+            <div className="space-y-1">
+              {NAVIGATION.map((item) => {
+                const active = isActive(item.href, item.exact)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`
+                      group flex items-center gap-3 px-4 py-3 font-bold text-sm tracking-wider transition-all duration-200
+                      ${active 
+                        ? 'bg-[#93b9e6] text-slate-900' 
+                        : 'text-white/50 hover:bg-white/5 hover:text-white'
+                      }
+                    `}
+                  >
+                    <item.icon className={`w-5 h-5 transition-transform duration-200 ${active ? '' : 'group-hover:scale-110'}`} />
+                    <span>{item.label}</span>
+                    {active && (
+                      <ChevronRight className="w-4 h-4 ml-auto" />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-white/10">
+              <p className="px-4 text-[10px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">
+                Overig
+              </p>
+              <div className="space-y-1">
+                <Link
+                  href="/dashboard/settings"
+                  className="flex items-center gap-3 px-4 py-3 text-white/40 hover:bg-white/5 hover:text-white/70 transition-colors font-bold text-sm tracking-wider"
+                >
+                  <Settings className="w-5 h-5" />
+                  <span>INSTELLINGEN</span>
+                </Link>
+                <Link
+                  href="/help"
+                  className="flex items-center gap-3 px-4 py-3 text-white/40 hover:bg-white/5 hover:text-white/70 transition-colors font-bold text-sm tracking-wider"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  <span>HELP</span>
+                </Link>
+              </div>
+            </div>
+          </nav>
+
+          {/* User section */}
+          <div className="p-4 border-t border-white/10">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors cursor-pointer group"
+            >
+              <div className="w-10 h-10 bg-[#93b9e6] flex items-center justify-center text-slate-900 font-black text-sm">
+                {userInitials}
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="font-bold text-white text-sm truncate">{session?.user?.name || 'Gebruiker'}</p>
+                <p className="text-xs text-white/40 truncate uppercase tracking-wider">Eigenaar</p>
+              </div>
+              <LogOut className="w-5 h-5 text-white/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="lg:pl-72 pt-16 lg:pt-0 min-h-screen relative">
+        {/* Desktop header */}
+        <header className="hidden lg:flex items-center justify-between px-8 h-20 border-b border-slate-200 bg-white sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 bg-[#93b9e6]">
+              <Shield className="w-4 h-4 text-slate-900" />
+              <span className="text-xs font-black text-slate-900 uppercase tracking-wider">Blockchain Verified</span>
+              <Sparkles className="w-3.5 h-3.5 text-slate-900" />
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button className="p-2.5 hover:bg-slate-100 transition-colors relative">
+              <Bell className="w-5 h-5 text-slate-600" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-[#93b9e6]" />
+            </button>
+            <div className="w-px h-8 bg-slate-200" />
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 p-2 hover:bg-slate-100 transition-colors"
+            >
+              <div className="w-9 h-9 bg-slate-900 flex items-center justify-center text-white font-black text-sm">
+                {userInitials}
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+          </div>
+        </header>
+
+        {children}
+      </main>
+    </div>
+  )
 }
