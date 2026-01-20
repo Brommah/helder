@@ -5,8 +5,7 @@ import Link from 'next/link'
 import { Logo } from '@/components/ui/logo'
 import { 
   HelpCircle, MessageCircle, Book, Phone, Mail, 
-  ChevronDown, ChevronRight, Search, ArrowLeft,
-  FileText, Shield, Home, Clock, Share2, Euro
+  ChevronDown, ChevronRight, Search, ArrowLeft
 } from 'lucide-react'
 
 const FAQ = [
@@ -74,16 +73,16 @@ export default function HelpPage() {
   })).filter(category => category.questions.length > 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-[#0a0a0a]">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header className="border-b border-white/10">
         <div className="max-w-5xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="flex items-center gap-2 text-slate-600 hover:text-[#1a1a2e] transition-colors">
+            <Link href="/dashboard" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors">
               <ArrowLeft className="w-5 h-5" />
-              <span>Terug naar dashboard</span>
+              <span className="text-sm font-bold uppercase tracking-wider">Terug naar dashboard</span>
             </Link>
-            <Logo size="sm" href="/" />
+            <Logo size="sm" variant="light" href="/" />
           </div>
         </div>
       </header>
@@ -91,29 +90,29 @@ export default function HelpPage() {
       <main className="max-w-5xl mx-auto px-6 py-12">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-[#1a1a2e] rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <HelpCircle className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-[#93b9e6] flex items-center justify-center mx-auto mb-6">
+            <HelpCircle className="w-8 h-8 text-slate-900" />
           </div>
-          <h1 className="text-3xl font-bold text-[#1a1a2e] mb-4">Hoe kunnen we helpen?</h1>
-          <p className="text-slate-600 max-w-xl mx-auto">
+          <h1 className="text-3xl font-black text-white uppercase tracking-tight mb-4">Hoe kunnen we helpen?</h1>
+          <p className="text-white/40 max-w-xl mx-auto">
             Vind antwoorden op veelgestelde vragen of neem contact met ons op.
           </p>
         </div>
 
         {/* Search */}
         <div className="relative max-w-2xl mx-auto mb-12">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
           <input
             type="text"
             placeholder="Zoek in de veelgestelde vragen..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#1a1a2e]/10 focus:border-[#1a1a2e] transition-all text-lg"
+            className="w-full pl-12 pr-4 py-4 bg-slate-900 border border-white/10 text-white placeholder-white/30 focus:border-[#93b9e6] focus:outline-none transition-colors text-lg"
           />
         </div>
 
         {/* Quick Links */}
-        <div className="grid md:grid-cols-3 gap-4 mb-12">
+        <div className="grid md:grid-cols-3 gap-1 mb-12">
           {[
             { icon: Book, label: 'Handleidingen', href: '#' },
             { icon: MessageCircle, label: 'Live chat', href: '#' },
@@ -122,13 +121,13 @@ export default function HelpPage() {
             <a
               key={item.label}
               href={item.href}
-              className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all"
+              className="flex items-center gap-4 p-4 bg-slate-900 border border-white/10 hover:bg-slate-800 hover:border-white/20 transition-all group"
             >
-              <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
-                <item.icon className="w-6 h-6 text-slate-600" />
+              <div className="w-12 h-12 bg-white/5 flex items-center justify-center group-hover:bg-[#93b9e6] transition-colors">
+                <item.icon className="w-6 h-6 text-white/50 group-hover:text-slate-900 transition-colors" />
               </div>
-              <span className="font-semibold text-[#1a1a2e]">{item.label}</span>
-              <ChevronRight className="w-5 h-5 text-slate-400 ml-auto" />
+              <span className="font-black text-white uppercase tracking-wider text-sm">{item.label}</span>
+              <ChevronRight className="w-5 h-5 text-white/20 ml-auto" />
             </a>
           ))}
         </div>
@@ -137,20 +136,20 @@ export default function HelpPage() {
         <div className="space-y-8">
           {filteredFAQ.map((category) => (
             <div key={category.category}>
-              <h2 className="text-lg font-semibold text-[#1a1a2e] mb-4">{category.category}</h2>
-              <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100">
-                {category.questions.map((item) => (
-                  <div key={item.q}>
+              <h2 className="text-sm font-black text-[#93b9e6] uppercase tracking-wider mb-4">{category.category}</h2>
+              <div className="bg-slate-900 border border-white/10">
+                {category.questions.map((item, index) => (
+                  <div key={item.q} className={index > 0 ? 'border-t border-white/5' : ''}>
                     <button
                       onClick={() => toggleQuestion(item.q)}
-                      className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
+                      className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
                     >
-                      <span className="font-medium text-[#1a1a2e]">{item.q}</span>
-                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openQuestions.includes(item.q) ? 'rotate-180' : ''}`} />
+                      <span className="font-bold text-white text-sm">{item.q}</span>
+                      <ChevronDown className={`w-5 h-5 text-white/30 transition-transform ${openQuestions.includes(item.q) ? 'rotate-180' : ''}`} />
                     </button>
                     {openQuestions.includes(item.q) && (
                       <div className="px-4 pb-4">
-                        <p className="text-slate-600">{item.a}</p>
+                        <p className="text-white/50 text-sm leading-relaxed">{item.a}</p>
                       </div>
                     )}
                   </div>
@@ -161,20 +160,20 @@ export default function HelpPage() {
         </div>
 
         {/* Contact */}
-        <div className="mt-12 bg-[#1a1a2e] rounded-2xl p-8 text-center">
-          <h2 className="text-xl font-bold text-white mb-2">Nog vragen?</h2>
-          <p className="text-white/70 mb-6">Ons team staat voor u klaar</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-12 bg-[#93b9e6] p-8">
+          <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Nog vragen?</h2>
+          <p className="text-slate-900/60 mb-6">Ons team staat voor u klaar</p>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <a
               href="tel:+31701234567"
-              className="flex items-center gap-2 px-6 py-3 bg-white text-[#1a1a2e] font-semibold rounded-xl hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-black uppercase tracking-wider hover:bg-slate-800 transition-colors"
             >
               <Phone className="w-5 h-5" />
               070 - 123 45 67
             </a>
             <a
               href="mailto:support@helder.nl"
-              className="flex items-center gap-2 px-6 py-3 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-transparent text-slate-900 font-black uppercase tracking-wider border-2 border-slate-900/30 hover:border-slate-900 transition-colors"
             >
               <Mail className="w-5 h-5" />
               support@helder.nl
