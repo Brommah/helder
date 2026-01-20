@@ -21,7 +21,7 @@ async function main() {
   // ========================================
   const completedUser = await prisma.user.upsert({
     where: { email: 'completed@helder.nl' },
-    update: { password: hashedPassword },
+    update: { password: hashedPassword, updatedAt: new Date() },
     create: {
       id: 'user-completed-1',
       email: 'completed@helder.nl',
@@ -30,6 +30,7 @@ async function main() {
       role: UserRole.HOMEOWNER,
       emailVerified: new Date(),
       termsAcceptedAt: new Date(),
+      updatedAt: new Date(),
     },
   })
   console.log('✅ Created completed home owner:', completedUser.email)
@@ -37,7 +38,7 @@ async function main() {
   // Completed property - AI is active
   const completedProperty = await prisma.property.upsert({
     where: { id: 'property-completed-1' },
-    update: {},
+    update: { updatedAt: new Date() },
     create: {
       id: 'property-completed-1',
       name: 'Villa Zonneweide',
@@ -58,6 +59,7 @@ async function main() {
       wozWaarde: 685000,
       wozYear: 2025,
       ownerId: completedUser.id,
+      updatedAt: new Date(),
     },
   })
   console.log('✅ Created completed property:', completedProperty.name)
@@ -67,7 +69,7 @@ async function main() {
   // ========================================
   const buildingUser = await prisma.user.upsert({
     where: { email: 'building@helder.nl' },
-    update: { password: hashedPassword },
+    update: { password: hashedPassword, updatedAt: new Date() },
     create: {
       id: 'user-building-1',
       email: 'building@helder.nl',
@@ -76,6 +78,7 @@ async function main() {
       role: UserRole.HOMEOWNER,
       emailVerified: new Date(),
       termsAcceptedAt: new Date(),
+      updatedAt: new Date(),
     },
   })
   console.log('✅ Created building home owner:', buildingUser.email)
@@ -83,7 +86,7 @@ async function main() {
   // Under construction property - AI is disabled
   const buildingProperty = await prisma.property.upsert({
     where: { id: 'property-building-1' },
-    update: {},
+    update: { updatedAt: new Date() },
     create: {
       id: 'property-building-1',
       name: 'Kavel 24 - De Buitenplaats',
@@ -103,6 +106,7 @@ async function main() {
       expectedEnd: new Date('2026-08-01'),
       verificationBadge: false,
       ownerId: buildingUser.id,
+      updatedAt: new Date(),
     },
   })
   console.log('✅ Created building property:', buildingProperty.name)
@@ -112,7 +116,7 @@ async function main() {
   // ========================================
   const demoUser = await prisma.user.upsert({
     where: { email: 'demo@woningpaspoort.nl' },
-    update: { password: hashedPassword },
+    update: { password: hashedPassword, updatedAt: new Date() },
     create: {
       id: 'demo-user-1',
       email: 'demo@woningpaspoort.nl',
@@ -121,6 +125,7 @@ async function main() {
       role: UserRole.HOMEOWNER,
       emailVerified: new Date(),
       termsAcceptedAt: new Date(),
+      updatedAt: new Date(),
     },
   })
   console.log('✅ Created legacy demo user:', demoUser.email)
@@ -128,7 +133,7 @@ async function main() {
   // Create demo builder
   const demoBuilder = await prisma.user.upsert({
     where: { email: 'builder@woningpaspoort.nl' },
-    update: { password: hashedPassword },
+    update: { password: hashedPassword, updatedAt: new Date() },
     create: {
       id: 'demo-builder-1',
       email: 'builder@woningpaspoort.nl',
@@ -137,6 +142,7 @@ async function main() {
       role: UserRole.BUILDER,
       emailVerified: new Date(),
       termsAcceptedAt: new Date(),
+      updatedAt: new Date(),
     },
   })
   console.log('✅ Created demo builder:', demoBuilder.email)
@@ -144,7 +150,7 @@ async function main() {
   // Create admin user
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@woningpaspoort.nl' },
-    update: { password: hashedPassword },
+    update: { password: hashedPassword, updatedAt: new Date() },
     create: {
       id: 'admin-user-1',
       email: 'admin@woningpaspoort.nl',
@@ -153,6 +159,7 @@ async function main() {
       role: UserRole.ADMIN,
       emailVerified: new Date(),
       termsAcceptedAt: new Date(),
+      updatedAt: new Date(),
     },
   })
   console.log('✅ Created admin user:', adminUser.email)
