@@ -5,7 +5,7 @@
   "description": "Digital housing passport - comprehensive property documentation platform",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
