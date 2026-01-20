@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Logo } from '@/components/ui/logo'
 import {
   Mail, Lock, User, Phone, ArrowRight, AlertCircle,
-  Eye, EyeOff, Check, Shield
+  Eye, EyeOff, Check, Shield, Loader2
 } from 'lucide-react'
 
 export default function RegisterPage() {
@@ -106,103 +106,101 @@ export default function RegisterPage() {
   const strength = passwordStrength()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="p-6">
+      <header className="p-6 bg-white border-b border-slate-200">
         <Logo size="md" href="/" />
       </header>
 
       {/* Main */}
-      <main className="flex-1 flex items-center justify-center px-6 pb-12">
+      <main className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#1a1a2e] mb-2">
-              Maak uw account aan
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight mb-2">
+              ACCOUNT
+              <br />
+              <span className="text-[#93b9e6]">AANMAKEN</span>
             </h1>
-            <p className="text-slate-600">
+            <p className="text-slate-500 font-medium">
               Start met uw digitale woningpaspoort
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">
+              <div className="flex items-center gap-3 p-4 bg-red-50 text-red-700 border-l-4 border-red-500">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <p className="text-sm">{error}</p>
+                <p className="text-sm font-bold">{error}</p>
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-[#1a1a2e] mb-2">
+              <label className="block text-xs font-black text-slate-900 mb-3 uppercase tracking-wider">
                 Volledige naam
               </label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#93b9e6] transition-colors" />
                 <input
-                  id="name"
                   name="name"
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Jan van der Berg"
                   required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:border-[#1a1a2e] focus:ring-4 focus:ring-[#1a1a2e]/5 outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-200 focus:border-[#93b9e6] focus:bg-white outline-none transition-all font-medium"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#1a1a2e] mb-2">
+              <label className="block text-xs font-black text-slate-900 mb-3 uppercase tracking-wider">
                 E-mailadres
               </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#93b9e6] transition-colors" />
                 <input
-                  id="email"
                   name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="uw@email.nl"
                   required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:border-[#1a1a2e] focus:ring-4 focus:ring-[#1a1a2e]/5 outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-200 focus:border-[#93b9e6] focus:bg-white outline-none transition-all font-medium"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-[#1a1a2e] mb-2">
-                Telefoonnummer <span className="text-slate-400">(optioneel)</span>
+              <label className="block text-xs font-black text-slate-900 mb-3 uppercase tracking-wider">
+                Telefoonnummer <span className="text-slate-400 font-normal">(optioneel)</span>
               </label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#93b9e6] transition-colors" />
                 <input
-                  id="phone"
                   name="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="06 12345678"
-                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:border-[#1a1a2e] focus:ring-4 focus:ring-[#1a1a2e]/5 outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-200 focus:border-[#93b9e6] focus:bg-white outline-none transition-all font-medium"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#1a1a2e] mb-2">
+              <label className="block text-xs font-black text-slate-900 mb-3 uppercase tracking-wider">
                 Wachtwoord
               </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#93b9e6] transition-colors" />
                 <input
-                  id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Minimaal 8 tekens"
                   required
-                  className="w-full pl-12 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl focus:border-[#1a1a2e] focus:ring-4 focus:ring-[#1a1a2e]/5 outline-none transition-all"
+                  className="w-full pl-12 pr-12 py-4 bg-white border-2 border-slate-200 focus:border-[#93b9e6] focus:bg-white outline-none transition-all font-medium"
                 />
                 <button
                   type="button"
@@ -214,32 +212,31 @@ export default function RegisterPage() {
               </div>
               {strength && (
                 <div className="mt-2">
-                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-1 bg-slate-200 overflow-hidden">
                     <div
                       className={`h-full ${strength.color} transition-all duration-300`}
                       style={{ width: strength.width }}
                     />
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{strength.label}</p>
+                  <p className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">{strength.label}</p>
                 </div>
               )}
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#1a1a2e] mb-2">
+              <label className="block text-xs font-black text-slate-900 mb-3 uppercase tracking-wider">
                 Bevestig wachtwoord
               </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#93b9e6] transition-colors" />
                 <input
-                  id="confirmPassword"
                   name="confirmPassword"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Herhaal uw wachtwoord"
                   required
-                  className="w-full pl-12 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl focus:border-[#1a1a2e] focus:ring-4 focus:ring-[#1a1a2e]/5 outline-none transition-all"
+                  className="w-full pl-12 pr-12 py-4 bg-white border-2 border-slate-200 focus:border-[#93b9e6] focus:bg-white outline-none transition-all font-medium"
                 />
                 {formData.confirmPassword && formData.password === formData.confirmPassword && (
                   <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
@@ -248,17 +245,16 @@ export default function RegisterPage() {
             </div>
 
             {/* Terms & Conditions */}
-            <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+            <div className="p-4 bg-amber-50 border-l-4 border-amber-500">
               <div className="flex items-start gap-3">
                 <Shield className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm text-amber-900 font-medium mb-2">
-                    Beta versie disclaimer
+                  <p className="text-sm text-amber-900 font-black uppercase tracking-wider mb-2">
+                    Beta versie
                   </p>
                   <p className="text-xs text-amber-700 mb-3">
                     Woningpaspoort is momenteel in beta. De documentatie en informatie in dit platform
                     is bedoeld ter ondersteuning en vervangt geen professioneel juridisch of bouwkundig advies.
-                    Raadpleeg altijd een erkende kwaliteitsborger voor officiële Wkb-compliance.
                   </p>
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input
@@ -266,11 +262,11 @@ export default function RegisterPage() {
                       name="acceptTerms"
                       checked={formData.acceptTerms}
                       onChange={handleChange}
-                      className="w-4 h-4 rounded border-amber-300 mt-0.5"
+                      className="w-4 h-4 border-2 border-amber-400 mt-0.5"
                     />
-                    <span className="text-sm text-amber-800">
+                    <span className="text-sm text-amber-800 font-medium">
                       Ik begrijp dit en ga akkoord met de{' '}
-                      <a href="#" onClick={(e) => { e.preventDefault(); alert('Algemene voorwaarden worden binnenkort gepubliceerd.'); }} className="underline cursor-pointer">algemene voorwaarden</a>
+                      <Link href="/voorwaarden" className="underline font-bold">algemene voorwaarden</Link>
                     </span>
                   </label>
                 </div>
@@ -280,22 +276,28 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading || !formData.acceptTerms}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-[#1a1a2e] text-white font-semibold rounded-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="group w-full flex items-center justify-center gap-3 py-5 bg-slate-900 text-white font-black uppercase tracking-wider hover:bg-[#93b9e6] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Aanmaken...</span>
+                </>
               ) : (
                 <>
-                  Account aanmaken
-                  <ArrowRight className="w-5 h-5" />
+                  <span>Account aanmaken</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
-          <p className="mt-8 text-center text-slate-600">
+          <p className="text-center mt-8 text-slate-500 font-medium">
             Heeft u al een account?{' '}
-            <Link href="/auth/login" className="text-[#1a1a2e] font-semibold hover:underline">
+            <Link
+              href="/auth/login"
+              className="font-black text-slate-900 hover:text-[#93b9e6] transition-colors uppercase"
+            >
               Log in
             </Link>
           </p>

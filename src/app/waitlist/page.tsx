@@ -85,7 +85,7 @@ export default function WaitlistPage() {
                   belangrijke les geleerd:
                 </p>
                 <blockquote className="border-l-4 border-amber-400 pl-4 text-lg font-medium text-[#1a1a2e] italic">
-                  "De beste bouwprojecten zijn de meest transparante."
+                  &quot;De beste bouwprojecten zijn de meest transparante.&quot;
                 </blockquote>
                 <p className="text-slate-600 mt-4">
                   Daarom bouwen we <strong>Helder</strong> - de technologie-arm van Broersma Engineering. 

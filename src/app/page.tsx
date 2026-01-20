@@ -206,31 +206,30 @@ function HeroSection() {
   )
 }
 
-function StatsSection() {
-  const stats = [
-    { value: 68, suffix: '', label: 'JAAR ERVARING', icon: Calendar },
-    { value: 19, suffix: 'K+', label: 'PROJECTEN', icon: Building2 },
-    { value: 4.9, suffix: '/5', label: 'BEOORDELING', icon: Star },
-    { value: 20, suffix: ' JAAR', label: 'DOCUMENTATIE', icon: Database },
-  ]
+function StatItem({ value, suffix, label, icon: Icon, isDecimal }: { 
+  value: number; suffix: string; label: string; icon: React.ElementType; isDecimal?: boolean 
+}) {
+  const { count, ref } = useCounter(Math.floor(value))
+  return (
+    <div ref={ref} className="text-center">
+      <Icon className="w-6 h-6 text-[#93b9e6] mx-auto mb-4" />
+      <p className="text-3xl lg:text-5xl font-black text-white mb-2">
+        {isDecimal ? '4.9' : count}{suffix}
+      </p>
+      <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">{label}</p>
+    </div>
+  )
+}
 
+function StatsSection() {
   return (
     <section className="py-16 bg-slate-900">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((stat, i) => {
-            const { count, ref } = useCounter(typeof stat.value === 'number' ? Math.floor(stat.value) : stat.value)
-            const Icon = stat.icon
-            return (
-              <div key={i} ref={ref} className="text-center">
-                <Icon className="w-6 h-6 text-[#93b9e6] mx-auto mb-4" />
-                <p className="text-3xl lg:text-5xl font-black text-white mb-2">
-                  {stat.value === 4.9 ? '4.9' : count}{stat.suffix}
-                </p>
-                <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">{stat.label}</p>
-              </div>
-            )
-          })}
+          <StatItem value={68} suffix="" label="JAAR ERVARING" icon={Calendar} />
+          <StatItem value={19} suffix="K+" label="PROJECTEN" icon={Building2} />
+          <StatItem value={4.9} suffix="/5" label="BEOORDELING" icon={Star} isDecimal />
+          <StatItem value={20} suffix=" JAAR" label="DOCUMENTATIE" icon={Database} />
         </div>
       </div>
     </section>

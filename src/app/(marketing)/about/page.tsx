@@ -164,7 +164,7 @@ export default function AboutPage() {
             </h2>
             <p className="text-xl text-slate-600 mb-12 text-center max-w-2xl mx-auto">
               Onze waarden zijn niet geschreven in een vergadering, maar gevormd door generaties
-              van klanten en collega's die ons vertrouwden.
+              van klanten en collega&apos;s die ons vertrouwden.
             </p>
 
             <div className="grid md:grid-cols-3 gap-8">

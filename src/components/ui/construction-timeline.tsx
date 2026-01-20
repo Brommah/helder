@@ -114,7 +114,7 @@ function TimelineItem({
           {event.photos && event.photos > 0 && (
             <div className="flex items-center gap-1.5 text-sm text-slate-500">
               <Camera className="w-4 h-4" />
-              <span>{event.photos} foto's</span>
+              <span>{event.photos} foto&apos;s</span>
             </div>
           )}
           

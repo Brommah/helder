@@ -319,7 +319,7 @@ function IntroStep() {
       
       <p className="text-lg text-slate-600 mb-8 max-w-xl mx-auto">
         In een paar minuten maakt u het complete digitale dossier van uw nieuwe woning. 
-        Alle documenten, foto's en specificaties van uw nieuwbouwproject op één plek.
+        Alle documenten, foto&apos;s en specificaties van uw nieuwbouwproject op één plek.
       </p>
       
       <div className="grid md:grid-cols-3 gap-4 text-left">
@@ -628,7 +628,7 @@ function ConstructionStep({
             className="input"
           />
           <p className="text-sm text-slate-500 mt-1">
-            Uw aannemer kan later foto's sturen via WhatsApp
+            Uw aannemer kan later foto&apos;s sturen via WhatsApp
           </p>
         </div>
       </div>

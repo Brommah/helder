@@ -73,16 +73,16 @@ export default function HelpPage() {
   })).filter(category => category.questions.length > 0)
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="border-b border-white/10">
+      <header className="bg-white border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="flex items-center gap-2 text-white/40 hover:text-white transition-colors">
+            <Link href="/dashboard" className="flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-colors">
               <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-bold uppercase tracking-wider">Terug naar dashboard</span>
+              <span className="text-sm font-black uppercase tracking-wider">Terug naar dashboard</span>
             </Link>
-            <Logo size="sm" variant="light" href="/" />
+            <Logo size="sm" href="/" />
           </div>
         </div>
       </header>
@@ -93,21 +93,21 @@ export default function HelpPage() {
           <div className="w-16 h-16 bg-[#93b9e6] flex items-center justify-center mx-auto mb-6">
             <HelpCircle className="w-8 h-8 text-slate-900" />
           </div>
-          <h1 className="text-3xl font-black text-white uppercase tracking-tight mb-4">Hoe kunnen we helpen?</h1>
-          <p className="text-white/40 max-w-xl mx-auto">
+          <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight mb-4">Hoe kunnen we helpen?</h1>
+          <p className="text-slate-500 max-w-xl mx-auto">
             Vind antwoorden op veelgestelde vragen of neem contact met ons op.
           </p>
         </div>
 
         {/* Search */}
         <div className="relative max-w-2xl mx-auto mb-12">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <input
             type="text"
             placeholder="Zoek in de veelgestelde vragen..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-slate-900 border border-white/10 text-white placeholder-white/30 focus:border-[#93b9e6] focus:outline-none transition-colors text-lg"
+            className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-[#93b9e6] focus:outline-none transition-colors text-lg"
           />
         </div>
 
@@ -121,13 +121,13 @@ export default function HelpPage() {
             <a
               key={item.label}
               href={item.href}
-              className="flex items-center gap-4 p-4 bg-slate-900 border border-white/10 hover:bg-slate-800 hover:border-white/20 transition-all group"
+              className="flex items-center gap-4 p-4 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all group"
             >
-              <div className="w-12 h-12 bg-white/5 flex items-center justify-center group-hover:bg-[#93b9e6] transition-colors">
-                <item.icon className="w-6 h-6 text-white/50 group-hover:text-slate-900 transition-colors" />
+              <div className="w-12 h-12 bg-slate-100 flex items-center justify-center group-hover:bg-[#93b9e6] transition-colors">
+                <item.icon className="w-6 h-6 text-slate-500 group-hover:text-slate-900 transition-colors" />
               </div>
-              <span className="font-black text-white uppercase tracking-wider text-sm">{item.label}</span>
-              <ChevronRight className="w-5 h-5 text-white/20 ml-auto" />
+              <span className="font-black text-slate-900 uppercase tracking-wider text-sm">{item.label}</span>
+              <ChevronRight className="w-5 h-5 text-slate-300 ml-auto" />
             </a>
           ))}
         </div>
@@ -136,20 +136,20 @@ export default function HelpPage() {
         <div className="space-y-8">
           {filteredFAQ.map((category) => (
             <div key={category.category}>
-              <h2 className="text-sm font-black text-[#93b9e6] uppercase tracking-wider mb-4">{category.category}</h2>
-              <div className="bg-slate-900 border border-white/10">
+              <h2 className="text-sm font-black text-[#93b9e6] uppercase tracking-[0.2em] mb-4">{category.category}</h2>
+              <div className="bg-white border border-slate-200">
                 {category.questions.map((item, index) => (
-                  <div key={item.q} className={index > 0 ? 'border-t border-white/5' : ''}>
+                  <div key={item.q} className={index > 0 ? 'border-t border-slate-100' : ''}>
                     <button
                       onClick={() => toggleQuestion(item.q)}
-                      className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
                     >
-                      <span className="font-bold text-white text-sm">{item.q}</span>
-                      <ChevronDown className={`w-5 h-5 text-white/30 transition-transform ${openQuestions.includes(item.q) ? 'rotate-180' : ''}`} />
+                      <span className="font-bold text-slate-900 text-sm">{item.q}</span>
+                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openQuestions.includes(item.q) ? 'rotate-180' : ''}`} />
                     </button>
                     {openQuestions.includes(item.q) && (
                       <div className="px-4 pb-4">
-                        <p className="text-white/50 text-sm leading-relaxed">{item.a}</p>
+                        <p className="text-slate-500 text-sm leading-relaxed">{item.a}</p>
                       </div>
                     )}
                   </div>

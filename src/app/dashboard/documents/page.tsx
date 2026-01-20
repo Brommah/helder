@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { 
   FileText, Upload, Search, Filter, Grid3X3, List, Download, Eye,
   Check, Clock, AlertCircle, Lock, MoreVertical, ChevronDown,
-  File, Image, FileSpreadsheet, Folder, Plus, X, Shield,
+  File, Image as ImageIcon, FileSpreadsheet, Folder, Plus, X, Shield,
   CheckCircle2, ArrowUpRight, Trash2, Share2
 } from 'lucide-react'
 
@@ -319,7 +319,7 @@ function DocumentCard({ document, index, onClick }: { document: Document; index:
   const getTypeIcon = () => {
     switch (document.type) {
       case 'pdf': return <FileText className="w-6 h-6" />
-      case 'image': return <Image className="w-6 h-6" />
+      case 'image': return <ImageIcon className="w-6 h-6" />
       case 'spreadsheet': return <FileSpreadsheet className="w-6 h-6" />
       default: return <File className="w-6 h-6" />
     }

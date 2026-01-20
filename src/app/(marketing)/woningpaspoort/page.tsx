@@ -146,7 +146,7 @@ function TestimonialsSection() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Quote */}
           <div>
-            <div className="text-6xl lg:text-8xl font-black text-white/20 mb-6">"</div>
+            <div className="text-6xl lg:text-8xl font-black text-white/20 mb-6">&quot;</div>
             <p className="text-2xl lg:text-4xl font-bold text-white leading-tight mb-8">
               De makelaar schatte €520.000. We verkochten voor{' '}
               <span className="text-[#050507]">€615.000</span>.
@@ -274,7 +274,7 @@ function WhatIsItSection() {
             <h3 className="text-2xl font-black text-slate-900 mb-4">ALTIJD BIJ DE HAND</h3>
             <p className="text-slate-500 mb-6">
               Loodgieter aan de deur? Open de app, toon de plattegrond met alle leidingen. 
-              Garantie nodig? Zoek op "warmtepomp" en vind direct de factuur.
+              Garantie nodig? Zoek op &quot;warmtepomp&quot; en vind direct de factuur.
             </p>
             <div className="flex items-center gap-4 text-sm font-bold">
               <span className="text-[#93b9e6]">iOS</span>
