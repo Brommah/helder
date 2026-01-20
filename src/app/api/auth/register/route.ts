@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { randomUUID } from 'crypto'
 
 const registerSchema = z.object({
   email: z.string().email('Ongeldig e-mailadres'),
@@ -34,11 +35,13 @@ export async function POST(request: Request) {
     // Create user
     const user = await db.user.create({
       data: {
+        id: randomUUID(),
         email: validated.email,
         password: hashedPassword,
         name: validated.name,
         phone: validated.phone,
         termsAcceptedAt: new Date(),
+        updatedAt: new Date(),
         role: 'HOMEOWNER',
       },
     })
