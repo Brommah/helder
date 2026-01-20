@@ -7,7 +7,7 @@ import {
   Home, FileText, Clock, Package, Share2, Shield, ArrowRight,
   CheckCircle2, TrendingUp, Calendar, MapPin,
   Zap, Thermometer, Wind, Lock, ExternalLink,
-  Sparkles, Building2, Eye
+  Sparkles, Building2, Eye, Brain, Bell
 } from 'lucide-react'
 
 // Animated counter hook
@@ -61,12 +61,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 const TIMELINE_PREVIEW = [
-  { phase: 'FUNDERING', status: 'completed', date: 'Sep 2025' },
-  { phase: 'RUWBOUW', status: 'completed', date: 'Nov 2025' },
-  { phase: 'GEVEL & DAK', status: 'current', date: 'Jan 2026', progress: 60 },
-  { phase: 'INSTALLATIES', status: 'upcoming', date: 'Mrt 2026' },
-  { phase: 'AFBOUW', status: 'upcoming', date: 'Mei 2026' },
-  { phase: 'OPLEVERING', status: 'upcoming', date: 'Jul 2026' },
+  { phase: 'FUNDERING', status: 'completed', date: 'Sep 2024' },
+  { phase: 'RUWBOUW', status: 'completed', date: 'Nov 2024' },
+  { phase: 'GEVEL & DAK', status: 'completed', date: 'Jan 2025' },
+  { phase: 'INSTALLATIES', status: 'completed', date: 'Mrt 2025' },
+  { phase: 'AFBOUW', status: 'completed', date: 'Mei 2025' },
+  { phase: 'OPLEVERING', status: 'completed', date: 'Jul 2025' },
 ]
 
 const RECENT_DOCUMENTS = [
@@ -105,8 +105,12 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="px-3 py-1 bg-[#93b9e6] text-slate-900 text-[10px] font-black uppercase tracking-wider">
-                      Nieuwbouw
+                    <span className="px-3 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-wider">
+                      Opgeleverd
+                    </span>
+                    <span className="px-3 py-1 bg-[#93b9e6] text-slate-900 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                      <Brain className="w-3 h-3" />
+                      AI Actief
                     </span>
                   </div>
                   <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight mb-3">
@@ -114,7 +118,7 @@ export default function DashboardPage() {
                   </h1>
                   <div className="flex items-center gap-2 text-white/50 text-sm">
                     <MapPin className="w-4 h-4" />
-                    <span>Kavel 12, Woonwijk De Buitenplaats, Almere</span>
+                    <span>Zonneweidelaan 12, Almere Haven</span>
                   </div>
                   <div className="flex items-center gap-4 mt-4">
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10">
@@ -123,7 +127,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10">
                       <Calendar className="w-4 h-4 text-white/50" />
-                      <span className="text-white/80 text-sm font-bold">2025-2026</span>
+                      <span className="text-white/80 text-sm font-bold">Opgeleverd Jul 2025</span>
                     </div>
                   </div>
                 </div>
@@ -145,21 +149,33 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Progress bar */}
+            {/* AI Savings Summary */}
             <div className="mt-8 pt-6 border-t border-white/10">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Bouwvoortgang</span>
-                <span className="text-white font-black text-2xl">75%</span>
-              </div>
-              <div className="h-2 bg-white/10 overflow-hidden">
-                <div 
-                  className="h-full bg-[#93b9e6] transition-all duration-1000"
-                  style={{ width: '75%' }}
-                />
-              </div>
-              <div className="flex items-center justify-between mt-3">
-                <span className="text-[#93b9e6] text-sm font-bold">Gevel & Dak (60%)</span>
-                <span className="text-white/40 text-sm">Verwacht: Juli 2026</span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Link href="/dashboard/ai" className="group">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Brain className="w-5 h-5 text-emerald-400" />
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">AI Besparing dit jaar</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-3xl font-black text-emerald-400">€2.840</span>
+                    <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </Link>
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Bell className="w-5 h-5 text-amber-400" />
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Actie vereist</span>
+                  </div>
+                  <span className="text-3xl font-black text-white">1</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Shield className="w-5 h-5 text-[#93b9e6]" />
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Woningwaarde</span>
+                  </div>
+                  <span className="text-3xl font-black text-white">€685.000</span>
+                </div>
               </div>
             </div>
           </div>

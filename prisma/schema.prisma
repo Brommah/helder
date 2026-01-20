@@ -1,6 +1,3 @@
-// Woningpaspoort Database Schema
-// Comprehensive housing lifecycle documentation system
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,272 +8,399 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ============================================
-// Authentication & Users
-// ============================================
-
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String?   // Hashed password for credentials auth
-  name          String?
-  emailVerified DateTime?
-  image         String?
-  phone         String?
-  role          UserRole  @default(HOMEOWNER)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Terms acceptance (Wkb disclaimer)
-  termsAcceptedAt DateTime?
-
-  // Relations
-  accounts      Account[]
-  sessions      Session[]
-  properties    Property[]
-  company       Company?   @relation(fields: [companyId], references: [id])
-  companyId     String?
-  documents     Document[]
-  timelineEvents TimelineEvent[]
-}
-
-enum UserRole {
-  HOMEOWNER
-  BUILDER
-  CONTRACTOR
-  INSPECTOR
-  MUNICIPALITY
-  ADMIN
-}
-
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Certification {
+  id          String    @id
+  name        String
+  issuer      String
+  issuedAt    DateTime
+  expiresAt   DateTime?
+  documentUrl String?
+  companyId   String
+  Company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
-// ============================================
-// Companies (Builders, Contractors)
-// ============================================
-
 model Company {
-  id            String      @id @default(cuid())
+  id            String          @id
   name          String
-  kvkNumber     String?     @unique  // Chamber of Commerce number
+  kvkNumber     String?         @unique
   type          CompanyType
-  verified      Boolean     @default(false)
+  verified      Boolean         @default(false)
   verifiedAt    DateTime?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  // Contact
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
   email         String?
   phone         String?
   address       String?
   postcode      String?
   city          String?
+  Certification Certification[]
+  Project       Project[]
+  User          User[]
+}
 
-  // Relations
-  employees     User[]
-  projects      Project[]
-  certifications Certification[]
+model CostBreakdown {
+  id          String       @id
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime
+  category    CostCategory
+  description String?
+  budgeted    Decimal
+  actual      Decimal      @default(0)
+  propertyId  String
+  Property    Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, category])
+  @@index([propertyId])
+}
+
+model Document {
+  id              String         @id
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime
+  name            String
+  description     String?
+  type            DocumentType
+  mimeType        String
+  fileSize        Int
+  fileUrl         String
+  documentDate    DateTime?
+  expiresAt       DateTime?
+  verified        Boolean        @default(false)
+  verifiedBy      String?
+  extractedData   Json?
+  propertyId      String?
+  projectId       String?
+  phaseId         String?
+  timelineEventId String?
+  uploadedById    String
+  ProjectPhase    ProjectPhase?  @relation(fields: [phaseId], references: [id])
+  Project         Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  Property        Property?      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  TimelineEvent   TimelineEvent? @relation(fields: [timelineEventId], references: [id])
+  User            User           @relation(fields: [uploadedById], references: [id])
+
+  @@index([projectId])
+  @@index([propertyId])
+  @@index([type])
+}
+
+model MaintenanceRecord {
+  id             String              @id
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime
+  title          String
+  description    String?
+  category       MaintenanceCategory
+  performedAt    DateTime?
+  scheduledFor   DateTime?
+  nextDueDate    DateTime?
+  intervalMonths Int?
+  performedBy    String?
+  cost           Decimal?
+  status         MaintenanceStatus   @default(SCHEDULED)
+  propertyId     String
+  Property       Property            @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([category])
+  @@index([nextDueDate])
+  @@index([propertyId])
+}
+
+model MaterialUsage {
+  id              String           @id
+  createdAt       DateTime         @default(now())
+  category        MaterialCategory
+  name            String
+  brand           String?
+  productCode     String?
+  color           String?
+  quantity        Decimal?
+  unit            String?
+  batchNumber     String?
+  appliedAt       DateTime?
+  appliedBy       String?
+  location        String?
+  specSheetUrl    String?
+  warrantyUrl     String?
+  warrantyExpires DateTime?
+  projectId       String
+  Project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([category])
+  @@index([projectId])
+}
+
+model Project {
+  id                String              @id
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  name              String
+  description       String?
+  type              ProjectType
+  status            ProjectStatus       @default(PLANNING)
+  plannedStart      DateTime?
+  plannedEnd        DateTime?
+  actualStart       DateTime?
+  actualEnd         DateTime?
+  estimatedCost     Decimal?
+  actualCost        Decimal?
+  wkbRequired       Boolean             @default(false)
+  wkbDossierId      String?
+  propertyId        String
+  companyId         String
+  Document          Document[]
+  MaterialUsage     MaterialUsage[]
+  Company           Company             @relation(fields: [companyId], references: [id])
+  Property          Property            @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  ProjectContractor ProjectContractor[]
+  ProjectPhase      ProjectPhase[]
+  TimelineEvent     TimelineEvent[]
+
+  @@index([companyId])
+  @@index([propertyId])
+  @@index([status])
+}
+
+model ProjectContractor {
+  id          String    @id
+  role        String
+  startDate   DateTime?
+  endDate     DateTime?
+  projectId   String
+  companyId   String?
+  companyName String?
+  contactInfo String?
+  Project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model ProjectPhase {
+  id           String      @id
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime
+  name         String
+  description  String?
+  order        Int
+  status       PhaseStatus @default(PENDING)
+  plannedStart DateTime?
+  plannedEnd   DateTime?
+  actualStart  DateTime?
+  actualEnd    DateTime?
+  projectId    String
+  Document     Document[]
+  Project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Property {
+  id                 String              @id
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime
+  name               String?
+  street             String?
+  houseNumber        String?
+  houseNumberAdd     String?
+  postcode           String?
+  city               String
+  country            String              @default("NL")
+  kavelNumber        String?
+  projectName        String?
+  isNieuwbouw        Boolean             @default(false)
+  kadasterNumber     String?
+  bagId              String?
+  propertyType       PropertyType
+  bouwjaar           Int?
+  woonoppervlakte    Int?
+  perceelOppervlakte Int?
+  inhoud             Int?
+  aantalKamers       Int?
+  aantalVerdiepingen Int?
+  startDate          DateTime?
+  expectedEnd        DateTime?
+  currentPhase       ConstructionPhase?
+  energielabel       EnergyLabel?
+  energielabelDate   DateTime?
+  energielabelExpiry DateTime?
+  wozWaarde          Decimal?
+  wozYear            Int?
+  koopsom            Decimal?
+  koopDatum          DateTime?
+  verificationBadge  Boolean             @default(false)
+  cereVaultId        String?
+  status             PropertyStatus      @default(ACTIVE)
+  ownerId            String
+  CostBreakdown      CostBreakdown[]
+  Document           Document[]
+  MaintenanceRecord  MaintenanceRecord[]
+  Project            Project[]
+  User               User                @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  PropertyShare      PropertyShare[]
+  TimelineEvent      TimelineEvent[]
+
+  @@index([kadasterNumber])
+  @@index([ownerId])
+  @@index([postcode])
+}
+
+model PropertyShare {
+  id             String           @id
+  createdAt      DateTime         @default(now())
+  expiresAt      DateTime?
+  token          String           @unique
+  accessLevel    ShareAccessLevel
+  allowedEmail   String?
+  password       String?
+  maxViews       Int?
+  viewCount      Int              @default(0)
+  showDocuments  Boolean          @default(true)
+  showTimeline   Boolean          @default(true)
+  showFinancials Boolean          @default(false)
+  propertyId     String
+  Property       Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([token])
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TimelineEvent {
+  id          String     @id
+  createdAt   DateTime   @default(now())
+  occurredAt  DateTime
+  type        EventType
+  title       String
+  description String?
+  metadata    Json?
+  temperature Float?
+  humidity    Float?
+  weather     String?
+  verified    Boolean    @default(false)
+  verifiedBy  String?
+  verifiedAt  DateTime?
+  contentHash String?
+  propertyId  String
+  createdById String
+  projectId   String?
+  Document    Document[]
+  User        User       @relation(fields: [createdById], references: [id])
+  Project     Project?   @relation(fields: [projectId], references: [id])
+  Property    Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([occurredAt])
+  @@index([propertyId])
+  @@index([type])
+}
+
+model User {
+  id              String          @id
+  email           String          @unique
+  password        String?
+  name            String?
+  emailVerified   DateTime?
+  image           String?
+  phone           String?
+  role            UserRole        @default(HOMEOWNER)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime
+  termsAcceptedAt DateTime?
+  companyId       String?
+  Account         Account[]
+  Document        Document[]
+  Property        Property[]
+  Session         Session[]
+  TimelineEvent   TimelineEvent[]
+  Company         Company?        @relation(fields: [companyId], references: [id])
 }
 
 enum CompanyType {
-  GENERAL_CONTRACTOR  // Hoofdaannemer
-  SUBCONTRACTOR       // Onderaannemer
+  GENERAL_CONTRACTOR
+  SUBCONTRACTOR
   ARCHITECT
   ENGINEER
   INSPECTOR
   OTHER
 }
 
-model Certification {
-  id          String   @id @default(cuid())
-  name        String
-  issuer      String
-  issuedAt    DateTime
-  expiresAt   DateTime?
-  documentUrl String?
-  
-  companyId   String
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-}
-
-// ============================================
-// Properties (Core Domain)
-// ============================================
-
-model Property {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Name (user-defined)
-  name            String?           // "Villa Zonneweide"
-
-  // Address (standard format)
-  street          String?
-  houseNumber     String?
-  houseNumberAdd  String?
-  postcode        String?
-  city            String
-  country         String   @default("NL")
-
-  // Kavel address (for nieuwbouw - address may not exist yet)
-  kavelNumber     String?           // "Kavel 12"
-  projectName     String?           // "Woonwijk De Buitenplaats"
-  isNieuwbouw     Boolean  @default(false)
-
-  // Cadastral
-  kadasterNumber  String?  // e.g., "ASD01 A 1234"
-  bagId           String?  // BAG identification
-
-  // Property Details
-  propertyType    PropertyType
-  bouwjaar        Int?              // Year built
-  woonoppervlakte Int?              // Living area m²
-  perceelOppervlakte Int?           // Plot area m²
-  inhoud          Int?              // Volume m³
-  aantalKamers    Int?              // Number of rooms
-  aantalVerdiepingen Int?           // Number of floors
-
-  // Construction Timeline (for nieuwbouw)
-  startDate       DateTime?         // Project start
-  expectedEnd     DateTime?         // Expected completion
-  currentPhase    ConstructionPhase?
-
-  // Energy
-  energielabel        EnergyLabel?
-  energielabelDate    DateTime?
-  energielabelExpiry  DateTime?
-
-  // Valuation
-  wozWaarde       Decimal?
-  wozYear         Int?
-  koopsom         Decimal?          // Purchase price
-  koopDatum       DateTime?         // Purchase date
-
-  // Verification badge
-  verificationBadge Boolean @default(false)
-  cereVaultId       String?
-
-  // Status
-  status          PropertyStatus @default(ACTIVE)
-
-  // Ownership
-  ownerId         String
-  owner           User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  
-  // Relations
-  documents       Document[]
-  timeline        TimelineEvent[]
-  maintenance     MaintenanceRecord[]
-  shares          PropertyShare[]
-  projects        Project[]
-  costs           CostBreakdown[]
-
-  @@index([ownerId])
-  @@index([postcode])
-  @@index([kadasterNumber])
-}
-
-enum PropertyType {
-  APPARTEMENT
-  TUSSENWONING
-  HOEKWONING
-  TWEE_ONDER_EEN_KAP
-  VRIJSTAAND
-  BUNGALOW
-  PENTHOUSE
-  MAISONNETTE
-  WOONBOERDERIJ
-  GRACHTENPAND
-  HERENHUIS
-  VILLA
-  STUDIO
-  OTHER
-}
-
-enum PropertyStatus {
-  ACTIVE
-  UNDER_CONSTRUCTION
-  RENOVATION
-  FOR_SALE
-  SOLD
-  ARCHIVED
-}
-
 enum ConstructionPhase {
-  GRONDWERK      // Foundation work
-  RUWBOUW        // Shell/structure
-  DAK_GEVEL      // Roof & facade
-  INSTALLATIES   // Installations (E/W/HVAC)
-  AFBOUW         // Finishing
-  OPLEVERING     // Handover
-}
-
-// ============================================
-// Cost Breakdown (Budget vs Actuals)
-// ============================================
-
-model CostBreakdown {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  category    CostCategory
-  description String?
-  budgeted    Decimal
-  actual      Decimal  @default(0)
-
-  propertyId  String
-  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-
-  @@unique([propertyId, category])
-  @@index([propertyId])
+  GRONDWERK
+  RUWBOUW
+  DAK_GEVEL
+  INSTALLATIES
+  AFBOUW
+  OPLEVERING
 }
 
 enum CostCategory {
-  KAVEL           // Plot/land
-  FOUNDATION      // Fundering
-  STRUCTURE       // Ruwbouw
-  ROOF_FACADE     // Dak & gevel
-  INSTALLATIONS   // Installaties
-  FINISHING       // Afbouw
-  KITCHEN         // Keuken
-  BATHROOM        // Badkamer
-  GARDEN          // Tuin
-  FEES            // Leges, notaris, etc.
-  OTHER           // Overig
+  KAVEL
+  FOUNDATION
+  STRUCTURE
+  ROOF_FACADE
+  INSTALLATIONS
+  FINISHING
+  KITCHEN
+  BATHROOM
+  GARDEN
+  FEES
+  OTHER
+}
+
+enum DocumentType {
+  DEED
+  PERMIT
+  CONTRACT
+  INSURANCE
+  FLOOR_PLAN
+  TECHNICAL_DRAWING
+  SPECIFICATION
+  MANUAL
+  ENERGY_LABEL
+  INSPECTION_REPORT
+  WARRANTY
+  CERTIFICATE
+  PHOTO
+  VIDEO
+  SMART_GLASSES_CAPTURE
+  MATERIAL_SPEC
+  COMPLIANCE_REPORT
+  HANDOVER_REPORT
+  INVOICE
+  QUOTE
+  NOTE
+  OTHER
 }
 
 enum EnergyLabel {
-  A_PLUS_PLUS_PLUS_PLUS  // A++++
-  A_PLUS_PLUS_PLUS       // A+++
-  A_PLUS_PLUS            // A++
-  A_PLUS                 // A+
+  A_PLUS_PLUS_PLUS_PLUS
+  A_PLUS_PLUS_PLUS
+  A_PLUS_PLUS
+  A_PLUS
   A
   B
   C
@@ -286,55 +410,7 @@ enum EnergyLabel {
   G
 }
 
-// ============================================
-// Timeline (Immutable Event Log)
-// ============================================
-
-model TimelineEvent {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  occurredAt  DateTime  // When the event actually happened
-  
-  // Event Details
-  type        EventType
-  title       String
-  description String?   @db.Text
-  
-  // Metadata
-  metadata    Json?     // Flexible field for event-specific data
-  
-  // Weather (for construction events)
-  temperature Float?
-  humidity    Float?
-  weather     String?   // "sunny", "rainy", etc.
-  
-  // Verification
-  verified    Boolean   @default(false)
-  verifiedBy  String?
-  verifiedAt  DateTime?
-  
-  // Hash for immutability (future: blockchain)
-  contentHash String?
-  
-  // Relations
-  propertyId  String
-  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  
-  createdById String
-  createdBy   User      @relation(fields: [createdById], references: [id])
-  
-  projectId   String?
-  project     Project?  @relation(fields: [projectId], references: [id])
-  
-  documents   Document[]
-
-  @@index([propertyId])
-  @@index([type])
-  @@index([occurredAt])
-}
-
 enum EventType {
-  // Construction
   CONSTRUCTION_START
   FOUNDATION_COMPLETE
   FRAMING_COMPLETE
@@ -346,183 +422,50 @@ enum EventType {
   PAINTING_COMPLETE
   FLOORING_COMPLETE
   FINAL_INSPECTION
-  HANDOVER             // Oplevering
-  
-  // Maintenance
+  HANDOVER
   MAINTENANCE_PERFORMED
   INSPECTION_COMPLETED
   REPAIR_COMPLETED
-  
-  // Documents
   DOCUMENT_ADDED
   PERMIT_RECEIVED
   CERTIFICATE_ISSUED
-  
-  // Ownership
   PURCHASE
   SALE
-  
-  // Energy
   ENERGY_LABEL_UPDATED
   SOLAR_INSTALLED
   INSULATION_UPGRADED
-  
-  // Other
   RENOVATION_START
   RENOVATION_COMPLETE
   CUSTOM
 }
 
-// ============================================
-// Construction Projects
-// ============================================
-
-model Project {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  // Basic Info
-  name        String
-  description String?   @db.Text
-  type        ProjectType
-  status      ProjectStatus @default(PLANNING)
-  
-  // Timeline
-  plannedStart  DateTime?
-  plannedEnd    DateTime?
-  actualStart   DateTime?
-  actualEnd     DateTime?
-  
-  // Budget
-  estimatedCost Decimal?
-  actualCost    Decimal?
-  
-  // Wkb Compliance
-  wkbRequired     Boolean  @default(false)
-  wkbDossierId    String?  // External compliance system ID
-  
-  // Relations
-  propertyId    String
-  property      Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  
-  companyId     String
-  company       Company   @relation(fields: [companyId], references: [id])
-  
-  phases        ProjectPhase[]
-  documents     Document[]
-  contractors   ProjectContractor[]
-  materials     MaterialUsage[]
-  timeline      TimelineEvent[]
-  
-  @@index([propertyId])
-  @@index([companyId])
-  @@index([status])
+enum MaintenanceCategory {
+  DAK
+  GEVEL
+  KOZIJNEN
+  GLAS
+  DAKGOTEN
+  CV_KETEL
+  AIRCO
+  VENTILATIE
+  SANITAIR
+  ELEKTRA
+  ZONNEPANELEN
+  TUIN
+  HEKWERK
+  BESTRATING
+  SCHOORSTEEEN
+  RIOOL
+  ALGEMEEN
 }
 
-enum ProjectType {
-  NEW_CONSTRUCTION  // Nieuwbouw
-  RENOVATION        // Verbouwing
-  EXTENSION         // Uitbouw/aanbouw
-  MAINTENANCE       // Onderhoud
-  RESTORATION       // Restauratie
-  DEMOLITION        // Sloop
-}
-
-enum ProjectStatus {
-  PLANNING
-  PERMIT_PENDING
-  APPROVED
+enum MaintenanceStatus {
+  SCHEDULED
+  OVERDUE
   IN_PROGRESS
-  ON_HOLD
-  INSPECTION
   COMPLETED
   CANCELLED
-}
-
-model ProjectPhase {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  name        String
-  description String?
-  order       Int
-  status      PhaseStatus @default(PENDING)
-  
-  plannedStart  DateTime?
-  plannedEnd    DateTime?
-  actualStart   DateTime?
-  actualEnd     DateTime?
-  
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  documents   Document[]
-  
-  @@index([projectId])
-}
-
-enum PhaseStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
   SKIPPED
-}
-
-model ProjectContractor {
-  id          String    @id @default(cuid())
-  
-  role        String    // e.g., "Electrician", "Plumber"
-  startDate   DateTime?
-  endDate     DateTime?
-  
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  // Either linked company or external
-  companyId   String?
-  companyName String?   // For external contractors not in system
-  contactInfo String?
-  
-  @@index([projectId])
-}
-
-// ============================================
-// Materials & Specifications
-// ============================================
-
-model MaterialUsage {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  
-  // Material Info
-  category    MaterialCategory
-  name        String
-  brand       String?
-  productCode String?
-  color       String?
-  
-  // Specifications
-  quantity    Decimal?
-  unit        String?   // "m²", "liters", "pieces"
-  batchNumber String?
-  
-  // Application
-  appliedAt   DateTime?
-  appliedBy   String?   // Contractor name
-  location    String?   // Where in the property
-  
-  // Documentation
-  specSheetUrl  String?
-  warrantyUrl   String?
-  warrantyExpires DateTime?
-  
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  @@index([projectId])
-  @@index([category])
 }
 
 enum MaterialCategory {
@@ -542,189 +485,71 @@ enum MaterialCategory {
   OTHER
 }
 
-// ============================================
-// Documents
-// ============================================
-
-model Document {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  // File Info
-  name        String
-  description String?
-  type        DocumentType
-  mimeType    String
-  fileSize    Int
-  fileUrl     String
-  
-  // Metadata
-  documentDate DateTime?  // Date on the document itself
-  expiresAt    DateTime?
-  
-  // Verification
-  verified    Boolean   @default(false)
-  verifiedBy  String?
-  
-  // Auto-extraction
-  extractedData Json?    // AI-extracted metadata
-  
-  // Relations
-  propertyId  String?
-  property    Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  
-  projectId   String?
-  project     Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  phaseId     String?
-  phase       ProjectPhase? @relation(fields: [phaseId], references: [id])
-  
-  timelineEventId String?
-  timelineEvent   TimelineEvent? @relation(fields: [timelineEventId], references: [id])
-  
-  uploadedById String
-  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
-  
-  @@index([propertyId])
-  @@index([projectId])
-  @@index([type])
-}
-
-enum DocumentType {
-  // Legal
-  DEED                 // Akte
-  PERMIT               // Vergunning
-  CONTRACT             // Contract
-  INSURANCE            // Verzekering
-  
-  // Technical
-  FLOOR_PLAN           // Plattegrond
-  TECHNICAL_DRAWING    // Technische tekening
-  SPECIFICATION        // Specificatie
-  MANUAL               // Handleiding
-  
-  // Certificates
-  ENERGY_LABEL
-  INSPECTION_REPORT    // Keuringsrapport
-  WARRANTY             // Garantie
-  CERTIFICATE
-  
-  // Media
-  PHOTO
-  VIDEO
-  SMART_GLASSES_CAPTURE
-  
-  // Construction
-  MATERIAL_SPEC
-  COMPLIANCE_REPORT    // Wkb rapport
-  HANDOVER_REPORT      // Opleveringsrapport
-  
-  // Financial
-  INVOICE
-  QUOTE                // Offerte
-  
-  // Other
-  NOTE
-  OTHER
-}
-
-// ============================================
-// Maintenance
-// ============================================
-
-model MaintenanceRecord {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  title       String
-  description String?   @db.Text
-  category    MaintenanceCategory
-  
-  // Scheduling
-  performedAt   DateTime?
-  scheduledFor  DateTime?
-  nextDueDate   DateTime?
-  intervalMonths Int?     // Recurring interval
-  
-  // Execution
-  performedBy String?
-  cost        Decimal?
-  
-  // Status
-  status      MaintenanceStatus @default(SCHEDULED)
-  
-  propertyId  String
-  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  
-  @@index([propertyId])
-  @@index([category])
-  @@index([nextDueDate])
-}
-
-enum MaintenanceCategory {
-  DAK               // Roof
-  GEVEL             // Facade
-  KOZIJNEN          // Window frames
-  GLAS              // Glass/windows
-  DAKGOTEN          // Gutters
-  CV_KETEL          // Heating system
-  AIRCO             // Air conditioning
-  VENTILATIE        // Ventilation
-  SANITAIR          // Plumbing
-  ELEKTRA           // Electrical
-  ZONNEPANELEN      // Solar panels
-  TUIN              // Garden
-  HEKWERK           // Fencing
-  BESTRATING        // Paving
-  SCHOORSTEEEN      // Chimney
-  RIOOL             // Sewage
-  ALGEMEEN          // General
-}
-
-enum MaintenanceStatus {
-  SCHEDULED
-  OVERDUE
+enum PhaseStatus {
+  PENDING
   IN_PROGRESS
   COMPLETED
-  CANCELLED
   SKIPPED
 }
 
-// ============================================
-// Sharing
-// ============================================
+enum ProjectStatus {
+  PLANNING
+  PERMIT_PENDING
+  APPROVED
+  IN_PROGRESS
+  ON_HOLD
+  INSPECTION
+  COMPLETED
+  CANCELLED
+}
 
-model PropertyShare {
-  id          String    @id @default(cuid())
-  createdAt   DateTime  @default(now())
-  expiresAt   DateTime?
-  
-  token       String    @unique
-  accessLevel ShareAccessLevel
-  
-  // Optional restrictions
-  allowedEmail  String?
-  password      String?  // Hashed
-  maxViews      Int?
-  viewCount     Int      @default(0)
-  
-  // What to show
-  showDocuments Boolean  @default(true)
-  showTimeline  Boolean  @default(true)
-  showFinancials Boolean @default(false)
-  
-  propertyId  String
-  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  
-  @@index([token])
-  @@index([propertyId])
+enum ProjectType {
+  NEW_CONSTRUCTION
+  RENOVATION
+  EXTENSION
+  MAINTENANCE
+  RESTORATION
+  DEMOLITION
+}
+
+enum PropertyStatus {
+  ACTIVE
+  UNDER_CONSTRUCTION
+  RENOVATION
+  FOR_SALE
+  SOLD
+  ARCHIVED
+}
+
+enum PropertyType {
+  APPARTEMENT
+  TUSSENWONING
+  HOEKWONING
+  TWEE_ONDER_EEN_KAP
+  VRIJSTAAND
+  BUNGALOW
+  PENTHOUSE
+  MAISONNETTE
+  WOONBOERDERIJ
+  GRACHTENPAND
+  HERENHUIS
+  VILLA
+  STUDIO
+  OTHER
 }
 
 enum ShareAccessLevel {
-  BASIC         // Address, type, size only
-  STANDARD      // + energy label, year built
-  FULL          // + all documents and timeline
-  BUYER         // Full + financial info
+  BASIC
+  STANDARD
+  FULL
+  BUYER
+}
+
+enum UserRole {
+  HOMEOWNER
+  BUILDER
+  CONTRACTOR
+  INSPECTOR
+  MUNICIPALITY
+  ADMIN
 }

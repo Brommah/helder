@@ -7,11 +7,12 @@ import { useSession, signOut } from 'next-auth/react'
 import { Logo } from '@/components/ui/logo'
 import {
   Home, Clock, FileText, Package, Share2, Settings, LogOut,
-  Menu, X, ChevronRight, Bell, Shield, HelpCircle, Sparkles, Loader2, Euro
+  Menu, X, ChevronRight, Bell, Shield, HelpCircle, Sparkles, Loader2, Euro, Brain
 } from 'lucide-react'
 
 const NAVIGATION = [
   { href: '/dashboard' as const, icon: Home, label: 'OVERZICHT', exact: true },
+  { href: '/dashboard/ai' as const, icon: Brain, label: 'AI INTELLIGENCE', badge: 'LIVE' },
   { href: '/dashboard/timeline' as const, icon: Clock, label: 'TIJDLIJN' },
   { href: '/dashboard/documents' as const, icon: FileText, label: 'DOCUMENTEN' },
   { href: '/dashboard/costs' as const, icon: Euro, label: 'KOSTEN' },
@@ -121,23 +122,26 @@ export default function DashboardLayout({
 
           {/* Property Card */}
           <div className="p-4">
-            <div className="bg-[#93b9e6] p-4">
+            <div className="bg-emerald-500 p-4">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
                   <Home className="w-6 h-6 text-slate-900" />
                 </div>
                 <div>
                   <p className="font-black text-slate-900 text-sm">VILLA ZONNEWEIDE</p>
-                  <p className="text-xs text-slate-900/60 font-medium">Kavel 12, Nieuwbouw</p>
+                  <p className="text-xs text-slate-900/60 font-medium">Almere Haven</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-1 bg-slate-900/20 overflow-hidden">
-                  <div className="h-full w-3/4 bg-slate-900" />
+                  <div className="h-full w-full bg-slate-900" />
                 </div>
-                <span className="text-xs font-black text-slate-900">75%</span>
+                <span className="text-xs font-black text-slate-900">100%</span>
               </div>
-              <p className="text-[10px] text-slate-900/50 mt-2 font-bold uppercase tracking-wider">Ruwbouw afgerond</p>
+              <p className="text-[10px] text-slate-900/50 mt-2 font-bold uppercase tracking-wider flex items-center gap-2">
+                <Shield className="w-3 h-3" />
+                Opgeleverd • Woningpaspoort actief
+              </p>
             </div>
           </div>
 
@@ -160,9 +164,16 @@ export default function DashboardLayout({
                     `}
                   >
                     <item.icon className={`w-5 h-5 transition-transform duration-200 ${active ? '' : 'group-hover:scale-110'}`} />
-                    <span>{item.label}</span>
-                    {active && (
-                      <ChevronRight className="w-4 h-4 ml-auto" />
+                    <span className="flex-1">{item.label}</span>
+                    {'badge' in item && item.badge && (
+                      <span className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                        active ? 'bg-slate-900 text-[#93b9e6]' : 'bg-emerald-500 text-white'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                    {active && !('badge' in item) && (
+                      <ChevronRight className="w-4 h-4" />
                     )}
                   </Link>
                 )
