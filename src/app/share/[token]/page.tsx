@@ -79,7 +79,7 @@ export default function SharePage({ params }: { params: { token: string } }) {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-3">
-              <Logo size="md" variant="light" />
+              <Logo size="md" dark />
               <span className="text-white/40 text-sm font-bold uppercase tracking-wider">Woningpaspoort</span>
             </Link>
             
@@ -321,7 +321,7 @@ export default function SharePage({ params }: { params: { token: string } }) {
       <footer className="border-t border-white/10 mt-16">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <Logo size="sm" variant="light" />
+            <Logo size="sm" dark />
             <p className="text-sm text-white/30 font-bold uppercase tracking-wider">
               © 2026 Helder Engineering
             </p>

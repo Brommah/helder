@@ -10,6 +10,7 @@ import {
   Zap, Shield, Sparkles, AlertCircle, Loader2
 } from 'lucide-react'
 import { CereVaultBadge } from '@/components/ui/verified-badge'
+import { Logo } from '@/components/ui/logo'
 
 // Nieuwbouw-focused wizard steps
 const STEPS = [
@@ -163,25 +164,22 @@ export default function WizardPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#1a1a2e]" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 z-50">
+      <header className="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center">
-              <Home className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-slate-900">Woningpaspoort</span>
+            <Logo size="md" />
           </Link>
           
-          <div className="text-sm text-slate-500">
+          <div className="text-xs font-black text-slate-500 uppercase tracking-wider">
             Stap {currentStep + 1} van {STEPS.length}
           </div>
         </div>
@@ -199,16 +197,16 @@ export default function WizardPage() {
               return (
                 <div key={step.id} className="flex items-center">
                   <div className={`
-                    w-10 h-10 rounded-xl flex items-center justify-center transition-all
-                    ${isActive ? 'bg-primary-600 text-white scale-110 shadow-lg shadow-primary-600/30' : 
-                      isComplete ? 'bg-success-500 text-white' : 
+                    w-10 h-10 flex items-center justify-center transition-all
+                    ${isActive ? 'bg-[#93b9e6] text-slate-900 scale-110' : 
+                      isComplete ? 'bg-emerald-500 text-white' : 
                       'bg-slate-200 text-slate-400'}
                   `}>
                     {isComplete ? <Check className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                   </div>
                   {index < STEPS.length - 1 && (
-                    <div className={`w-12 h-1 mx-1 rounded-full transition-colors ${
-                      isComplete ? 'bg-success-500' : 'bg-slate-200'
+                    <div className={`w-12 h-1 mx-1 transition-colors ${
+                      isComplete ? 'bg-emerald-500' : 'bg-slate-200'
                     }`} />
                   )}
                 </div>
@@ -217,7 +215,7 @@ export default function WizardPage() {
           </div>
 
           {/* Step Content */}
-          <div className="card p-8 animate-fade-in">
+          <div className="bg-white border border-slate-200 p-8">
             {STEPS[currentStep].id === 'intro' && (
               <IntroStep />
             )}
@@ -251,9 +249,9 @@ export default function WizardPage() {
             )}
 
             {error && (
-              <div className="mt-4 flex items-center gap-3 p-4 bg-red-50 text-red-700 rounded-xl border border-red-200">
+              <div className="mt-4 flex items-center gap-3 p-4 bg-red-50 text-red-700 border-l-4 border-red-500">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <p className="text-sm">{error}</p>
+                <p className="text-sm font-medium">{error}</p>
               </div>
             )}
           </div>
@@ -261,12 +259,12 @@ export default function WizardPage() {
       </main>
 
       {/* Footer Navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-200">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={prevStep}
             disabled={currentStep === 0}
-            className="btn-ghost disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-3 text-sm font-black uppercase tracking-wider text-slate-600 hover:text-slate-900 disabled:opacity-50 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Vorige
@@ -276,7 +274,7 @@ export default function WizardPage() {
             <button
               onClick={handleComplete}
               disabled={!isStepComplete() || isSubmitting}
-              className="btn-primary disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-3 bg-[#93b9e6] text-slate-900 text-sm font-black uppercase tracking-wider hover:bg-[#7aa8d9] disabled:opacity-50 transition-colors"
             >
               {isSubmitting ? (
                 <>
@@ -294,7 +292,7 @@ export default function WizardPage() {
             <button
               onClick={nextStep}
               disabled={!isStepComplete()}
-              className="btn-primary disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-sm font-black uppercase tracking-wider hover:bg-slate-800 disabled:opacity-50 transition-colors"
             >
               Volgende
               <ArrowRight className="w-4 h-4" />
@@ -309,11 +307,11 @@ export default function WizardPage() {
 function IntroStep() {
   return (
     <div className="text-center">
-      <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary-600/30">
+      <div className="w-20 h-20 bg-slate-900 flex items-center justify-center mx-auto mb-6">
         <Home className="w-10 h-10 text-white" />
       </div>
       
-      <h1 className="text-3xl font-bold text-slate-900 mb-4">
+      <h1 className="text-3xl font-black text-slate-900 uppercase tracking-wider mb-4">
         Welkom bij Woningpaspoort
       </h1>
       
@@ -322,26 +320,26 @@ function IntroStep() {
         Alle documenten, foto&apos;s en specificaties van uw nieuwbouwproject op één plek.
       </p>
       
-      <div className="grid md:grid-cols-3 gap-4 text-left">
-        <div className="p-4 bg-primary-50 rounded-xl">
-          <Shield className="w-8 h-8 text-primary-600 mb-2" />
-          <h3 className="font-semibold text-slate-900 mb-1">Wkb Compliant</h3>
+      <div className="grid md:grid-cols-3 gap-1 text-left">
+        <div className="p-4 bg-[#93b9e6]/10">
+          <Shield className="w-8 h-8 text-[#93b9e6] mb-2" />
+          <h3 className="font-black text-slate-900 uppercase tracking-wider text-sm mb-1">Wkb Compliant</h3>
           <p className="text-sm text-slate-600">
             Voldoet aan alle eisen van de Wet kwaliteitsborging
           </p>
         </div>
         
-        <div className="p-4 bg-success-50 rounded-xl">
-          <Zap className="w-8 h-8 text-success-600 mb-2" />
-          <h3 className="font-semibold text-slate-900 mb-1">Complete DNA</h3>
+        <div className="p-4 bg-emerald-50">
+          <Zap className="w-8 h-8 text-emerald-600 mb-2" />
+          <h3 className="font-black text-slate-900 uppercase tracking-wider text-sm mb-1">Complete DNA</h3>
           <p className="text-sm text-slate-600">
             Elk materiaal, elke aannemer, elke specificatie
           </p>
         </div>
         
-        <div className="p-4 bg-verified-50 rounded-xl">
-          <Shield className="w-8 h-8 text-verified-600 mb-2" />
-          <h3 className="font-semibold text-slate-900 mb-1">Blockchain Beveiligd</h3>
+        <div className="p-4 bg-slate-100">
+          <Shield className="w-8 h-8 text-slate-600 mb-2" />
+          <h3 className="font-black text-slate-900 uppercase tracking-wider text-sm mb-1">Blockchain Beveiligd</h3>
           <p className="text-sm text-slate-600">
             Cryptografisch geverifieerd via Cere Network
           </p>
@@ -365,24 +363,24 @@ function LocationStep({
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-primary-100 rounded-xl">
-          <MapPin className="w-6 h-6 text-primary-600" />
+        <div className="p-3 bg-[#93b9e6]/10">
+          <MapPin className="w-6 h-6 text-[#93b9e6]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Uw nieuwbouwproject</h2>
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-wider">Uw nieuwbouwproject</h2>
           <p className="text-slate-500">Geef uw project een naam en locatie</p>
         </div>
       </div>
 
       <div className="space-y-6">
         <div>
-          <label className="label">Projectnaam *</label>
+          <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Projectnaam *</label>
           <input
             type="text"
             value={formData.name}
             onChange={(e) => updateFormData('name', e.target.value)}
             placeholder="Bijv. Villa Zonneweide"
-            className="input"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
           />
           <p className="text-sm text-slate-500 mt-1">
             Kies een naam voor uw woningpaspoort
@@ -391,39 +389,39 @@ function LocationStep({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="label">Kavelnummer</label>
+            <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Kavelnummer</label>
             <input
               type="text"
               value={formData.kavelNumber}
               onChange={(e) => updateFormData('kavelNumber', e.target.value)}
               placeholder="Bijv. Kavel 12"
-              className="input"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
             />
           </div>
           <div>
-            <label className="label">Wijk/Project</label>
+            <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Wijk/Project</label>
             <input
               type="text"
               value={formData.projectName}
               onChange={(e) => updateFormData('projectName', e.target.value)}
               placeholder="Bijv. De Buitenplaats"
-              className="input"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
             />
           </div>
         </div>
 
         <div>
-          <label className="label">Plaats *</label>
+          <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Plaats *</label>
           <input
             type="text"
             value={formData.city}
             onChange={(e) => updateFormData('city', e.target.value)}
             placeholder="Bijv. Almere"
-            className="input"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
           />
         </div>
 
-        <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
+        <div className="p-4 bg-amber-50 border-l-4 border-amber-500">
           <p className="text-sm text-amber-800">
             <strong>Nieuwbouw?</strong> Geen probleem als uw adres nog niet bestaat.
             U kunt kavelnummer en wijk opgeven. Het officiële adres wordt later toegevoegd
@@ -445,30 +443,30 @@ function PropertyStep({
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-primary-100 rounded-xl">
-          <Building2 className="w-6 h-6 text-primary-600" />
+        <div className="p-3 bg-[#93b9e6]/10">
+          <Building2 className="w-6 h-6 text-[#93b9e6]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Type woning</h2>
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-wider">Type woning</h2>
           <p className="text-slate-500">Wat voor woning wordt er gebouwd?</p>
         </div>
       </div>
       
       <div className="space-y-6">
         {/* Property Type */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-1">
           {PROPERTY_TYPES.map(type => (
             <button
               key={type.id}
               onClick={() => updateFormData('propertyType', type.id)}
-              className={`p-4 rounded-xl border-2 text-left transition-all ${
+              className={`p-4 border-2 text-left transition-all ${
                 formData.propertyType === type.id
-                  ? 'border-primary-500 bg-primary-50'
+                  ? 'border-[#93b9e6] bg-[#93b9e6]/10'
                   : 'border-slate-200 hover:border-slate-300'
               }`}
             >
               <div className="text-2xl mb-2">{type.icon}</div>
-              <div className="font-semibold text-slate-900">{type.label}</div>
+              <div className="font-black text-slate-900 uppercase tracking-wider text-sm">{type.label}</div>
               <div className="text-sm text-slate-500">{type.desc}</div>
             </button>
           ))}
@@ -476,7 +474,7 @@ function PropertyStep({
         
         {/* Size */}
         <div>
-          <label className="label">Woonoppervlakte (m²)</label>
+          <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Woonoppervlakte (m²)</label>
           <div className="flex items-center gap-4">
             <input
               type="range"
@@ -485,17 +483,17 @@ function PropertyStep({
               step="5"
               value={formData.woonoppervlakte}
               onChange={(e) => updateFormData('woonoppervlakte', Number(e.target.value))}
-              className="flex-1 accent-primary-600"
+              className="flex-1 accent-[#93b9e6]"
             />
             <div className="w-20 text-center">
-              <span className="text-2xl font-bold text-primary-600">{formData.woonoppervlakte}</span>
+              <span className="text-2xl font-black text-[#93b9e6]">{formData.woonoppervlakte}</span>
               <span className="text-slate-500 text-sm ml-1">m²</span>
             </div>
           </div>
         </div>
         
         <div>
-          <label className="label">Perceeloppervlakte (m²)</label>
+          <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Perceeloppervlakte (m²)</label>
           <div className="flex items-center gap-4">
             <input
               type="range"
@@ -504,10 +502,10 @@ function PropertyStep({
               step="25"
               value={formData.perceelOppervlakte}
               onChange={(e) => updateFormData('perceelOppervlakte', Number(e.target.value))}
-              className="flex-1 accent-primary-600"
+              className="flex-1 accent-[#93b9e6]"
             />
             <div className="w-20 text-center">
-              <span className="text-2xl font-bold text-primary-600">{formData.perceelOppervlakte}</span>
+              <span className="text-2xl font-black text-[#93b9e6]">{formData.perceelOppervlakte}</span>
               <span className="text-slate-500 text-sm ml-1">m²</span>
             </div>
           </div>
@@ -516,11 +514,11 @@ function PropertyStep({
         {/* Rooms */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="label">Aantal kamers</label>
+            <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Aantal kamers</label>
             <select
               value={formData.kamers}
               onChange={(e) => updateFormData('kamers', Number(e.target.value))}
-              className="input"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
             >
               {[3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                 <option key={n} value={n}>{n} kamers</option>
@@ -528,11 +526,11 @@ function PropertyStep({
             </select>
           </div>
           <div>
-            <label className="label">Verdiepingen</label>
+            <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Verdiepingen</label>
             <select
               value={formData.verdiepingen}
               onChange={(e) => updateFormData('verdiepingen', Number(e.target.value))}
-              className="input"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
             >
               {[1, 2, 3].map(n => (
                 <option key={n} value={n}>{n} {n === 1 ? 'verdieping' : 'verdiepingen'}</option>
@@ -555,41 +553,41 @@ function ConstructionStep({
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-primary-100 rounded-xl">
-          <Calendar className="w-6 h-6 text-primary-600" />
+        <div className="p-3 bg-[#93b9e6]/10">
+          <Calendar className="w-6 h-6 text-[#93b9e6]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Bouwstatus</h2>
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-wider">Bouwstatus</h2>
           <p className="text-slate-500">In welke fase bevindt de bouw zich?</p>
         </div>
       </div>
       
       <div className="space-y-6">
         {/* Construction Phase */}
-        <div className="space-y-3">
+        <div className="space-y-1">
           {CONSTRUCTION_PHASES.map((phase, index) => (
             <button
               key={phase.id}
               onClick={() => updateFormData('constructionPhase', phase.id)}
-              className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-4 ${
+              className={`w-full p-4 border-2 text-left transition-all flex items-center gap-4 ${
                 formData.constructionPhase === phase.id
-                  ? 'border-primary-500 bg-primary-50'
+                  ? 'border-[#93b9e6] bg-[#93b9e6]/10'
                   : 'border-slate-200 hover:border-slate-300'
               }`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${
+              <div className={`w-10 h-10 flex items-center justify-center text-lg font-black ${
                 formData.constructionPhase === phase.id
-                  ? 'bg-primary-600 text-white'
+                  ? 'bg-[#93b9e6] text-slate-900'
                   : 'bg-slate-200 text-slate-500'
               }`}>
                 {index + 1}
               </div>
               <div>
-                <div className="font-semibold text-slate-900">{phase.label}</div>
+                <div className="font-black text-slate-900 uppercase tracking-wider text-sm">{phase.label}</div>
                 <div className="text-sm text-slate-500">{phase.desc}</div>
               </div>
               {formData.constructionPhase === phase.id && (
-                <Check className="w-5 h-5 text-primary-600 ml-auto" />
+                <Check className="w-5 h-5 text-[#93b9e6] ml-auto" />
               )}
             </button>
           ))}
@@ -598,34 +596,34 @@ function ConstructionStep({
         {/* Timeline */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="label">Startdatum bouw *</label>
+            <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Startdatum bouw *</label>
             <input
               type="date"
               value={formData.startDate}
               onChange={(e) => updateFormData('startDate', e.target.value)}
-              className="input"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
             />
           </div>
           <div>
-            <label className="label">Verwachte oplevering</label>
+            <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Verwachte oplevering</label>
             <input
               type="date"
               value={formData.expectedEnd}
               onChange={(e) => updateFormData('expectedEnd', e.target.value)}
-              className="input"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
             />
           </div>
         </div>
 
         {/* Builder Info */}
         <div>
-          <label className="label">Naam aannemer (optioneel)</label>
+          <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Naam aannemer (optioneel)</label>
           <input
             type="text"
             value={formData.aannemer}
             onChange={(e) => updateFormData('aannemer', e.target.value)}
             placeholder="Bijv. Helder Woningbouw"
-            className="input"
+            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 focus:border-[#93b9e6] focus:outline-none transition-colors"
           />
           <p className="text-sm text-slate-500 mt-1">
             Uw aannemer kan later foto&apos;s sturen via WhatsApp
@@ -646,24 +644,24 @@ function AccountStep({
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-primary-100 rounded-xl">
-          <Users className="w-6 h-6 text-primary-600" />
+        <div className="p-3 bg-[#93b9e6]/10">
+          <Users className="w-6 h-6 text-[#93b9e6]" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Bevestig uw gegevens</h2>
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-wider">Bevestig uw gegevens</h2>
           <p className="text-slate-500">Controleer en maak uw woningpaspoort aan</p>
         </div>
       </div>
 
       <div className="space-y-6">
         {/* Logged in user */}
-        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <div className="p-4 bg-slate-50 border border-slate-200">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold">
+            <div className="w-12 h-12 bg-slate-900 flex items-center justify-center text-white font-black">
               {session?.user?.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2) || 'U'}
             </div>
             <div>
-              <p className="font-semibold text-slate-900">{session?.user?.name || 'Gebruiker'}</p>
+              <p className="font-black text-slate-900">{session?.user?.name || 'Gebruiker'}</p>
               <p className="text-sm text-slate-500">{session?.user?.email}</p>
             </div>
             <Check className="w-5 h-5 text-emerald-500 ml-auto" />
@@ -671,45 +669,45 @@ function AccountStep({
         </div>
 
         {/* Summary */}
-        <div className="p-4 bg-slate-50 rounded-xl">
-          <h4 className="font-semibold text-slate-900 mb-3">Samenvatting woningpaspoort</h4>
+        <div className="p-4 bg-slate-50">
+          <h4 className="font-black text-slate-900 uppercase tracking-wider text-sm mb-3">Samenvatting woningpaspoort</h4>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
+            <div className="flex justify-between py-2 border-b border-slate-200">
               <span className="text-slate-500">Naam</span>
-              <span className="font-medium">{formData.name || '-'}</span>
+              <span className="font-bold text-slate-900">{formData.name || '-'}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between py-2 border-b border-slate-200">
               <span className="text-slate-500">Locatie</span>
-              <span className="font-medium">
+              <span className="font-bold text-slate-900">
                 {[formData.kavelNumber, formData.projectName, formData.city].filter(Boolean).join(', ') || '-'}
               </span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between py-2 border-b border-slate-200">
               <span className="text-slate-500">Type</span>
-              <span className="font-medium">{PROPERTY_TYPES.find(t => t.id === formData.propertyType)?.label || '-'}</span>
+              <span className="font-bold text-slate-900">{PROPERTY_TYPES.find(t => t.id === formData.propertyType)?.label || '-'}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between py-2 border-b border-slate-200">
               <span className="text-slate-500">Woonoppervlakte</span>
-              <span className="font-medium">{formData.woonoppervlakte} m²</span>
+              <span className="font-bold text-slate-900">{formData.woonoppervlakte} m²</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between py-2 border-b border-slate-200">
               <span className="text-slate-500">Bouwfase</span>
-              <span className="font-medium">{CONSTRUCTION_PHASES.find(p => p.id === formData.constructionPhase)?.label || '-'}</span>
+              <span className="font-bold text-slate-900">{CONSTRUCTION_PHASES.find(p => p.id === formData.constructionPhase)?.label || '-'}</span>
             </div>
             {formData.startDate && (
-              <div className="flex justify-between">
+              <div className="flex justify-between py-2">
                 <span className="text-slate-500">Startdatum</span>
-                <span className="font-medium">{new Date(formData.startDate).toLocaleDateString('nl-NL')}</span>
+                <span className="font-bold text-slate-900">{new Date(formData.startDate).toLocaleDateString('nl-NL')}</span>
               </div>
             )}
           </div>
         </div>
 
-        <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+        <div className="p-4 bg-emerald-50 border-l-4 border-emerald-500">
           <div className="flex items-start gap-3">
             <Shield className="w-5 h-5 text-emerald-600 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-emerald-800">Klaar om te starten</h4>
+              <h4 className="font-black text-emerald-800 uppercase tracking-wider text-sm">Klaar om te starten</h4>
               <p className="text-sm text-emerald-700 mt-1">
                 Uw woningpaspoort wordt beveiligd met cryptografische verificatie.
                 Alle documenten worden onveranderbaar vastgelegd.

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Logo } from '@/components/ui/logo'
+import { Navigation } from '@/components/layout/navigation'
 import { SharedFooter } from '@/components/layout/footer'
 import { FileText, ArrowLeft } from 'lucide-react'
 
@@ -10,35 +10,21 @@ export const metadata = {
 
 export default function VoorwaardenPage() {
   return (
-    <div className="min-h-screen bg-[#FAFBFC]">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <Logo size="lg" />
-            <Link 
-              href="/"
-              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-[#1a1a2e] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Terug naar home
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-slate-50">
+      <Navigation />
 
       {/* Hero */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-slate-50 to-white">
+      <section className="pt-32 pb-16 bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-[#93b9e6]100 rounded-xl">
-              <FileText className="w-8 h-8 text-[#93b9e6]600" />
+            <div className="p-3 bg-[#93b9e6]/10">
+              <FileText className="w-8 h-8 text-[#93b9e6]" />
             </div>
-            <span className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-black text-slate-500 uppercase tracking-[0.3em]">
               Juridisch
             </span>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold text-[#1a1a2e] mb-4">
+          <h1 className="text-4xl lg:text-5xl font-black text-slate-900 uppercase tracking-wider mb-4">
             Algemene Voorwaarden
           </h1>
           <p className="text-lg text-slate-600">
@@ -51,9 +37,9 @@ export default function VoorwaardenPage() {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="prose prose-lg prose-slate max-w-none">
-            <div className="p-6 bg-[#93b9e6]50 rounded-2xl border border-[#93b9e6]100 mb-12 not-prose">
-              <p className="text-[#93b9e6]800">
-                <strong>Let op:</strong> Deze voorwaarden zijn van toepassing op alle diensten 
+            <div className="p-6 bg-[#93b9e6]/10 border-l-4 border-[#93b9e6] mb-12 not-prose">
+              <p className="text-slate-700">
+                <strong className="font-black">Let op:</strong> Deze voorwaarden zijn van toepassing op alle diensten 
                 van Helder Woningbouw B.V. Door gebruik te maken van onze diensten gaat u 
                 akkoord met deze voorwaarden.
               </p>
@@ -135,7 +121,7 @@ export default function VoorwaardenPage() {
             <h2>Artikel 11 - Privacy</h2>
             <p>
               Helder verwerkt persoonsgegevens conform de AVG. Zie onze{' '}
-              <Link href="/privacy" className="text-[#93b9e6]600 hover:underline">
+              <Link href="/privacy" className="text-[#93b9e6] hover:underline font-bold">
                 privacyverklaring
               </Link>{' '}
               voor meer informatie.
