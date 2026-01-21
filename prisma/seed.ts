@@ -306,7 +306,7 @@ async function main() {
           },
           submittedBy: 'Jan Jansen',
           submittedAt: new Date(doc.date).toISOString(),
-        } : null,
+        } : undefined,
         updatedAt: new Date(),
       },
     })
