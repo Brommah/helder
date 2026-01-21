@@ -315,10 +315,10 @@ export default function DashboardPage() {
                             <div className="w-20 h-1 bg-slate-100 overflow-hidden">
                               <div 
                                 className="h-full bg-[#93b9e6] transition-all duration-1000"
-                                style={{ width: `${item.progress}%` }}
+                                style={{ width: `${(item as { progress: number }).progress}%` }}
                               />
                             </div>
-                            <span className="text-xs font-black text-[#93b9e6]">{item.progress}%</span>
+                            <span className="text-xs font-black text-[#93b9e6]">{(item as { progress: number }).progress}%</span>
                           </div>
                         )}
                         

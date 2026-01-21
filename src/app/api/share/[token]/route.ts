@@ -75,6 +75,7 @@ export async function GET(
                 ProjectPhase: {
                   orderBy: { order: 'asc' },
                 },
+                Company: true,
               },
             },
             CostBreakdown: true,

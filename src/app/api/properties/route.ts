@@ -50,11 +50,11 @@ export async function GET() {
     const properties = await db.property.findMany({
       where: { ownerId: session.user.id },
       include: {
-        costs: true,
+        CostBreakdown: true,
         _count: {
           select: {
-            documents: true,
-            timeline: true,
+            Document: true,
+            TimelineEvent: true,
           }
         }
       },
@@ -88,6 +88,7 @@ export async function POST(request: Request) {
 
     const property = await db.property.create({
       data: {
+        id: `prop_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name: validated.name,
         kavelNumber: validated.kavelNumber,
         projectName: validated.projectName,
@@ -105,6 +106,7 @@ export async function POST(request: Request) {
         status: 'UNDER_CONSTRUCTION',
         verificationBadge: true, // Mock for now
         ownerId: session.user.id,
+        updatedAt: new Date(),
       },
     })
 

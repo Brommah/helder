@@ -42,8 +42,6 @@ function validateTwilioRequest(
  */
 export async function POST(req: NextRequest) {
   try {
-    // Clone request for validation (formData consumes the body)
-    const clonedReq = req.clone();
     const body = await req.formData();
     
     // Convert FormData to plain object for validation and storage
@@ -54,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // Validate Twilio signature in production
     if (process.env.NODE_ENV === 'production') {
-      const isValid = validateTwilioRequest(clonedReq, params);
+      const isValid = validateTwilioRequest(req, params);
       if (!isValid) {
         console.error('[WhatsApp] Invalid Twilio signature - rejecting request');
         return new NextResponse('Forbidden', { status: 403 });

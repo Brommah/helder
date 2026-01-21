@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { EventType } from '@prisma/client';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -283,18 +284,18 @@ Antwoord ALLEEN met valid JSON. Vul alle velden in, gebruik lege arrays [] als n
 /**
  * Map classification to timeline event type
  */
-export function getTimelineEventType(phase: string): string {
-  const mapping: Record<string, string> = {
-    'GRONDWERK': 'FOUNDATION_START',
-    'FUNDERING': 'FOUNDATION_COMPLETE',
-    'RUWBOUW': 'FRAMING_COMPLETE',
-    'DAKCONSTRUCTIE': 'ROOFING_COMPLETE',
-    'DAKBEDEKKING': 'ROOFING_COMPLETE',
-    'GEVEL': 'EXTERIOR_COMPLETE',
-    'KOZIJNEN': 'WINDOWS_INSTALLED',
-    'INSTALLATIES': 'SYSTEMS_INSTALLED',
-    'AFBOUW': 'INTERIOR_COMPLETE',
-    'OPLEVERING': 'HANDOVER',
+export function getTimelineEventType(phase: string): EventType {
+  const mapping: Record<string, EventType> = {
+    'GRONDWERK': EventType.FOUNDATION_START,
+    'FUNDERING': EventType.FOUNDATION_COMPLETE,
+    'RUWBOUW': EventType.FRAMING_COMPLETE,
+    'DAKCONSTRUCTIE': EventType.ROOFING_COMPLETE,
+    'DAKBEDEKKING': EventType.ROOFING_COMPLETE,
+    'GEVEL': EventType.EXTERIOR_COMPLETE,
+    'KOZIJNEN': EventType.WINDOWS_INSTALLED,
+    'INSTALLATIES': EventType.SYSTEMS_INSTALLED,
+    'AFBOUW': EventType.INTERIOR_COMPLETE,
+    'OPLEVERING': EventType.HANDOVER,
   };
-  return mapping[phase] || 'DOCUMENT_ADDED';
+  return mapping[phase] || EventType.DOCUMENT_ADDED;
 }

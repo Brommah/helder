@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
       project: {
         id: projectId,
         name: project?.name || 'Onbekend project',
-        property: project?.Property?.address || null,
+        property: project?.Property ? `${project.Property.street || ''} ${project.Property.houseNumber || ''}, ${project.Property.city}`.trim() : null,
       },
       summary: {
         totalDocuments: documents.length,

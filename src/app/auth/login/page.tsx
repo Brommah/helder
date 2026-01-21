@@ -89,7 +89,7 @@ function LoginForm() {
       if (result?.error) {
         setError(result.error)
       } else {
-        router.push(account.redirect)
+        router.push(account.redirect as any)
         router.refresh()
       }
     } catch {

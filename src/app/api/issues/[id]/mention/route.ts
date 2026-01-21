@@ -89,7 +89,7 @@ export async function POST(
     if (text && issue.project.companyId) {
       const matches = await parseMentions(text, issue.project.companyId)
       const parsedIds = matches.map(m => m.teamMember.id)
-      memberIds = [...new Set([...memberIds, ...parsedIds])]
+      memberIds = Array.from(new Set([...memberIds, ...parsedIds]))
     }
 
     if (memberIds.length === 0) {

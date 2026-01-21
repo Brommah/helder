@@ -56,7 +56,7 @@ export function extractMentions(text: string): string[] {
     matches.push(match[1].toLowerCase())
   }
 
-  return [...new Set(matches)] // Remove duplicates
+  return Array.from(new Set(matches)) // Remove duplicates
 }
 
 /**

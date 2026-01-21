@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { downloadTwilioMedia, sendWhatsAppMessage } from './twilio';
-import { DocumentType, MessageStatus } from '@prisma/client';
+import { DocumentType, MessageStatus, EventType } from '@prisma/client';
 import { classifyConstructionImage, getTimelineEventType, ClassificationResult } from '../ai/classify-image';
 import {
   analyzePhaseProgress,
@@ -256,7 +256,7 @@ async function processMedia(
     }
 
     // AI Classification for images
-    let classification = null;
+    let classification: ClassificationResult | null = null;
     const builderName = getRandomBuilder();
     const timestamp = new Date();
 
@@ -273,17 +273,9 @@ async function processMedia(
       }
     }
 
-    // Generate smart document name
-    const docName = classification
-      ? `${classification.title} - ${builderName}`
-      : `Bouwfoto ${timestamp.toLocaleDateString('nl-NL')}`;
-
-    const docDescription = classification
-      ? buildDetailedDescription(classification, builderName)
-      : message.content || `Foto ingediend door ${builderName}`;
-
-    function buildDetailedDescription(c: typeof classification, builder: string): string {
-      const lines = [c.description, ''];
+    // Helper to build detailed description
+    const buildDetailedDescription = (c: ClassificationResult, builder: string): string => {
+      const lines: string[] = [c.description, ''];
 
       lines.push(`📋 Ingediend door: ${builder}`);
       lines.push(`🏗️ Fase: ${c.phaseName}`);
@@ -296,7 +288,7 @@ async function processMedia(
 
       if (c.materials && c.materials.length > 0) {
         lines.push('', '🧱 Materialen:');
-        c.materials.forEach(m => {
+        c.materials.forEach((m: { name: string; type?: string; brand?: string; dimensions?: string; color?: string; quantity?: string }) => {
           const details = [m.type, m.brand, m.dimensions, m.color].filter(Boolean).join(', ');
           lines.push(`  • ${m.name}${details ? ` (${details})` : ''}${m.quantity ? ` - ${m.quantity}` : ''}`);
         });
@@ -304,18 +296,18 @@ async function processMedia(
 
       if (c.quality) {
         lines.push('', `✅ Kwaliteitsscore: ${c.quality.score}/10`);
-        if (c.quality.notes?.length) c.quality.notes.forEach(n => lines.push(`  ✓ ${n}`));
-        if (c.quality.issues?.length) c.quality.issues.forEach(i => lines.push(`  ⚠️ ${i}`));
+        if (c.quality.notes?.length) c.quality.notes.forEach((n: string) => lines.push(`  ✓ ${n}`));
+        if (c.quality.issues?.length) c.quality.issues.forEach((i: string) => lines.push(`  ⚠️ ${i}`));
       }
 
       if (c.technicalSpecs?.length) {
         lines.push('', '📐 Technische specificaties:');
-        c.technicalSpecs.forEach(s => lines.push(`  • ${s}`));
+        c.technicalSpecs.forEach((s: string) => lines.push(`  • ${s}`));
       }
 
       if (c.measurements?.length) {
         lines.push('', '📏 Afmetingen:');
-        c.measurements.forEach(m => lines.push(`  • ${m}`));
+        c.measurements.forEach((m: string) => lines.push(`  • ${m}`));
       }
 
       if (c.equipmentDetected?.length || c.toolsVisible?.length) {
@@ -325,17 +317,17 @@ async function processMedia(
 
       if (c.safetyObservations?.length) {
         lines.push('', '🦺 Veiligheid:');
-        c.safetyObservations.forEach(s => lines.push(`  • ${s}`));
+        c.safetyObservations.forEach((s: string) => lines.push(`  • ${s}`));
       }
 
       if (c.nextSteps?.length) {
         lines.push('', '➡️ Volgende stappen:');
-        c.nextSteps.forEach(s => lines.push(`  • ${s}`));
+        c.nextSteps.forEach((s: string) => lines.push(`  • ${s}`));
       }
 
       if (c.attentionPoints?.length) {
         lines.push('', '⚠️ Aandachtspunten:');
-        c.attentionPoints.forEach(a => lines.push(`  • ${a}`));
+        c.attentionPoints.forEach((a: string) => lines.push(`  • ${a}`));
       }
 
       if (c.progressPercentage !== undefined) {
@@ -345,7 +337,16 @@ async function processMedia(
       lines.push('', `🎯 AI zekerheid: ${Math.round(c.confidence * 100)}%`);
 
       return lines.join('\n');
-    }
+    };
+
+    // Generate smart document name
+    const docName = classification
+      ? `${classification.title} - ${builderName}`
+      : `Bouwfoto ${timestamp.toLocaleDateString('nl-NL')}`;
+
+    const docDescription = classification
+      ? buildDetailedDescription(classification, builderName)
+      : message.content || `Foto ingediend door ${builderName}`;
 
     // Create document record
     const document = await db.document.create({
@@ -362,16 +363,14 @@ async function processMedia(
         uploadedById: companyUser.id,
         source: 'WHATSAPP',
         updatedAt: new Date(),
-        extractedData: {
+        extractedData: (classification ? {
           originalMediaUrl: message.mediaUrl,
           senderPhone: message.id,
           messageContent: message.content,
           whatsappNumberId: whatsappNumber.id,
           submittedBy: builderName,
           submittedAt: timestamp.toISOString(),
-
-          // Full AI classification with all specs
-          aiClassification: classification ? {
+          aiClassification: {
             phase: classification.phase,
             phaseName: classification.phaseName,
             category: classification.category,
@@ -395,8 +394,15 @@ async function processMedia(
             technicalSpecs: classification.technicalSpecs,
             nextSteps: classification.nextSteps,
             attentionPoints: classification.attentionPoints,
-          } : null,
-        },
+          },
+        } : {
+          originalMediaUrl: message.mediaUrl,
+          senderPhone: message.id,
+          messageContent: message.content,
+          whatsappNumberId: whatsappNumber.id,
+          submittedBy: builderName,
+          submittedAt: timestamp.toISOString(),
+        }) as any,
       },
     });
 
@@ -404,20 +410,9 @@ async function processMedia(
     if (docType === DocumentType.PHOTO || docType === DocumentType.VIDEO) {
       const propertyId = whatsappNumber.project?.Property?.id;
       if (propertyId) {
-        const eventType = classification
-          ? getTimelineEventType(classification.phase)
-          : 'DOCUMENT_ADDED';
-
-        const eventTitle = classification
-          ? `${classification.phaseName}: ${classification.title}`
-          : docType === DocumentType.PHOTO ? 'Foto toegevoegd' : 'Video toegevoegd';
-
-        const eventDescription = classification
-          ? buildTimelineDescription(classification, builderName)
-          : `Foto ingediend door ${builderName}`;
-
-        function buildTimelineDescription(c: typeof classification, builder: string): string {
-          const lines = [c.description];
+        // Helper to build timeline description
+        const buildTimelineDescription = (c: ClassificationResult, builder: string): string => {
+          const lines: string[] = [c.description];
 
           lines.push(`\n📸 Ingediend door ${builder}`);
           lines.push(`🏗️ Fase: ${c.phaseName}`);
@@ -427,7 +422,7 @@ async function processMedia(
           if (c.progressPercentage !== undefined) lines.push(`📊 Voortgang: ${c.progressPercentage}%`);
 
           if (c.materials?.length) {
-            lines.push(`🧱 Materialen: ${c.materials.map(m => m.name).join(', ')}`);
+            lines.push(`🧱 Materialen: ${c.materials.map((m: { name: string }) => m.name).join(', ')}`);
           }
 
           if (c.attentionPoints?.length) {
@@ -437,7 +432,19 @@ async function processMedia(
           lines.push(`🎯 Zekerheid: ${Math.round(c.confidence * 100)}%`);
 
           return lines.join('\n');
-        }
+        };
+
+        const eventType = classification
+          ? getTimelineEventType(classification.phase)
+          : EventType.DOCUMENT_ADDED;
+
+        const eventTitle = classification
+          ? `${classification.phaseName}: ${classification.title}`
+          : docType === DocumentType.PHOTO ? 'Foto toegevoegd' : 'Video toegevoegd';
+
+        const eventDescription = classification
+          ? buildTimelineDescription(classification, builderName)
+          : `Foto ingediend door ${builderName}`;
 
         await db.timelineEvent.create({
           data: {
@@ -449,41 +456,30 @@ async function processMedia(
             propertyId,
             projectId: whatsappNumber.projectId,
             createdById: companyUser.id,
-            metadata: classification ? {
-              // Basic
+            metadata: (classification ? {
               phase: classification.phase,
               phaseName: classification.phaseName,
               category: classification.category,
               confidence: classification.confidence,
               submittedBy: builderName,
               documentId: document.id,
-
-              // Detailed specs
               detectedElements: classification.detectedElements,
               materials: classification.materials,
               location: classification.location,
               quality: classification.quality,
               technicalSpecs: classification.technicalSpecs,
               measurements: classification.measurements,
-
-              // Progress & Status
               progressPercentage: classification.progressPercentage,
               workStatus: classification.workStatus,
-
-              // Safety & Compliance
               safetyObservations: classification.safetyObservations,
               complianceNotes: classification.complianceNotes,
-
-              // Environment
               weatherConditions: classification.weatherConditions,
               workersVisible: classification.workersVisible,
               equipmentDetected: classification.equipmentDetected,
               toolsVisible: classification.toolsVisible,
-
-              // Next steps
               nextSteps: classification.nextSteps,
               attentionPoints: classification.attentionPoints,
-            } : undefined,
+            } : undefined) as any,
           },
         });
       }

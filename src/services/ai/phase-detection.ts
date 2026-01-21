@@ -325,7 +325,10 @@ export async function analyzePhaseProgress(
   if (dbCurrentPhase) {
     const reverseMapping: Record<ConstructionPhase, DetailedPhase> = {
       [ConstructionPhase.GRONDWERK]: 'GRONDWERK',
+      [ConstructionPhase.FUNDERING]: 'FUNDERING',
       [ConstructionPhase.RUWBOUW]: 'RUWBOUW',
+      [ConstructionPhase.DAKCONSTRUCTIE]: 'DAKCONSTRUCTIE',
+      [ConstructionPhase.GEVELWERK]: 'GEVELWERK',
       [ConstructionPhase.DAK_GEVEL]: 'DAKCONSTRUCTIE',
       [ConstructionPhase.INSTALLATIES]: 'INSTALLATIES',
       [ConstructionPhase.AFBOUW]: 'AFBOUW',

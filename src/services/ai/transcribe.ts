@@ -82,7 +82,8 @@ export async function transcribeAudio(
     const extension = getAudioExtension(mimeType);
 
     // Create a File object from the buffer (required by OpenAI SDK)
-    const file = new File([audioBuffer], `audio.${extension}`, { type: mimeType });
+    const uint8Array = new Uint8Array(audioBuffer);
+    const file = new File([uint8Array], `audio.${extension}`, { type: mimeType });
 
     console.log(
       `[Transcribe] Processing audio: ${(audioBuffer.length / 1024).toFixed(1)}KB, type: ${mimeType}`

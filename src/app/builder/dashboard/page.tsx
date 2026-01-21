@@ -1012,14 +1012,24 @@ function ActivityItem({ item }: { item: ActivityItem }) {
     return `${Math.floor(diff / 86400)}d geleden`
   }
 
-  const Wrapper = item.projectId ? Link : 'div'
-  const wrapperProps = item.projectId 
-    ? { href: `/builder/projects/${item.projectId}` }
-    : {}
+  if (item.projectId) {
+    return (
+      <Link 
+        href={`/builder/projects/${item.projectId}`}
+        className="flex items-start gap-3 p-3 hover:bg-slate-50 transition-colors cursor-pointer group"
+      >
+        <div className="w-8 h-8 bg-slate-100 flex items-center justify-center flex-shrink-0 group-hover:bg-[#93b9e6]/20 transition-colors">{getIcon()}</div>
+        <div className="flex-1 min-w-0">
+          {getContent()}
+          <p className="text-[10px] text-slate-400 mt-1">{timeAgo(item.timestamp)}</p>
+        </div>
+        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors mt-1" />
+      </Link>
+    )
+  }
 
   return (
-    <Wrapper 
-      {...wrapperProps}
+    <div 
       className="flex items-start gap-3 p-3 hover:bg-slate-50 transition-colors cursor-pointer group"
     >
       <div className="w-8 h-8 bg-slate-100 flex items-center justify-center flex-shrink-0 group-hover:bg-[#93b9e6]/20 transition-colors">{getIcon()}</div>
@@ -1027,10 +1037,7 @@ function ActivityItem({ item }: { item: ActivityItem }) {
         {getContent()}
         <p className="text-[10px] text-slate-400 mt-1">{timeAgo(item.timestamp)}</p>
       </div>
-      {item.projectId && (
-        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors mt-1" />
-      )}
-    </Wrapper>
+    </div>
   )
 }
 

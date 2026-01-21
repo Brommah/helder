@@ -166,7 +166,7 @@ export function NotificationBell({ variant = 'light' }: NotificationBellProps) {
 
                 if (notification.link) {
                   return (
-                    <Link key={notification.id} href={notification.link}>
+                    <Link key={notification.id} href={notification.link as any}>
                       {content}
                     </Link>
                   )

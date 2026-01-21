@@ -164,34 +164,36 @@ export default function DocumentsPage() {
   const [selectedVoiceNote, setSelectedVoiceNote] = useState<VoiceNote | null>(null)
   const [voiceSearchQuery, setVoiceSearchQuery] = useState('')
 
+  // Fetch documents function
+  const fetchDocuments = async () => {
+    try {
+      const res = await fetch('/api/documents')
+      if (res.ok) {
+        const data = await res.json()
+        // Merge with mock documents, real docs first
+        const realDocs: Document[] = data.documents.map((doc: any) => ({
+          id: doc.id,
+          name: doc.name,
+          category: mapTypeToCategory(doc.type),
+          type: mapMimeToType(doc.mimeType),
+          size: formatSize(doc.fileSize),
+          uploadDate: doc.createdAt,
+          status: doc.verified ? 'verified' : 'pending',
+          required: false,
+          fileUrl: doc.fileUrl,
+          source: doc.source,
+          description: doc.description,
+          extractedData: doc.extractedData,
+        }))
+        setDocuments([...realDocs, ...MOCK_DOCUMENTS])
+      }
+    } catch (error) {
+      console.error('Failed to fetch documents:', error)
+    }
+  }
+
   // Fetch real documents from database
   useEffect(() => {
-    async function fetchDocuments() {
-      try {
-        const res = await fetch('/api/documents')
-        if (res.ok) {
-          const data = await res.json()
-          // Merge with mock documents, real docs first
-          const realDocs: Document[] = data.documents.map((doc: any) => ({
-            id: doc.id,
-            name: doc.name,
-            category: mapTypeToCategory(doc.type),
-            type: mapMimeToType(doc.mimeType),
-            size: formatSize(doc.fileSize),
-            uploadDate: doc.createdAt,
-            status: doc.verified ? 'verified' : 'pending',
-            required: false,
-            fileUrl: doc.fileUrl,
-            source: doc.source,
-            description: doc.description,
-            extractedData: doc.extractedData,
-          }))
-          setDocuments([...realDocs, ...MOCK_DOCUMENTS])
-        }
-      } catch (error) {
-        console.error('Failed to fetch documents:', error)
-      }
-    }
     fetchDocuments()
   }, [])
 

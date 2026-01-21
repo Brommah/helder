@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
     // Create a timeline event for the inspection request
     const timelineEvent = await db.timelineEvent.create({
       data: {
+        id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         title: `${inspectionLabel} aangevraagd`,
         description: notes || `Keuring aangevraagd via Quick Actions`,
         occurredAt: new Date(),
