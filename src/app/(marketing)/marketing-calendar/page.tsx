@@ -994,7 +994,7 @@ export default function MarketingCalendarPage() {
                     </div>
                     
                     <h3 className="text-2xl font-black text-slate-900 mb-4">
-                      "{post.hook}"
+                      &ldquo;{post.hook}&rdquo;
                     </h3>
                     
                     <div className="bg-white border border-slate-200 p-6 mb-6">

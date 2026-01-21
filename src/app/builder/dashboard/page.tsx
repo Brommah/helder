@@ -587,7 +587,7 @@ export default function BuilderDashboardPage() {
             {linkingStep === 'phone' ? (
               <>
                 <p className="text-slate-600 mb-4">
-                  Koppel een telefoonnummer om foto's via WhatsApp direct toe te voegen aan dit project.
+                  Koppel een telefoonnummer om foto&apos;s via WhatsApp direct toe te voegen aan dit project.
                 </p>
                 <div className="space-y-4">
                   <div>
@@ -829,7 +829,7 @@ function ProjectCard({
       <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="bg-slate-50 p-2 text-center">
           <p className="text-lg font-black text-slate-900">{project.photoCount}</p>
-          <p className="text-[9px] font-bold text-slate-400 uppercase">Foto's</p>
+          <p className="text-[9px] font-bold text-slate-400 uppercase">Foto&apos;s</p>
         </div>
         <div className="bg-slate-50 p-2 text-center">
           <p className="text-lg font-black text-slate-900">
@@ -939,7 +939,7 @@ function ProjectRow({
       <div className="hidden lg:flex items-center gap-4 w-32">
         <div className="text-center">
           <p className="text-sm font-black text-slate-900">{project.photoCount}</p>
-          <p className="text-[9px] text-slate-400">FOTO'S</p>
+          <p className="text-[9px] text-slate-400">FOTO&apos;S</p>
         </div>
         <div className="text-center">
           <p className={`text-sm font-black ${project.issueCount > 0 ? 'text-amber-600' : 'text-slate-900'}`}>

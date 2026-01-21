@@ -1437,7 +1437,7 @@ function VoiceNoteCard({
               {/* Transcription Preview */}
               {voiceNote.transcription ? (
                 <p className="text-sm text-slate-700 line-clamp-2 mb-2">
-                  "{voiceNote.transcription}"
+                  &ldquo;{voiceNote.transcription}&rdquo;
                 </p>
               ) : (
                 <p className="text-sm text-slate-400 italic mb-2">

@@ -335,7 +335,7 @@ export default function BuilderProjectDetailPage() {
             <div className="flex gap-1">
               <div className="bg-white/10 px-6 py-4 text-center">
                 <p className="text-3xl font-black">{project.stats.totalPhotos}</p>
-                <p className="text-[10px] font-bold text-white/50 uppercase tracking-wider">Foto's</p>
+                <p className="text-[10px] font-bold text-white/50 uppercase tracking-wider">Foto&apos;s</p>
               </div>
               <div className="bg-white/10 px-6 py-4 text-center">
                 <p className="text-3xl font-black">{project.stats.qualityScore}%</p>
@@ -429,7 +429,7 @@ export default function BuilderProjectDetailPage() {
                             </p>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="text-sm text-slate-400">{phasePhotos.length} foto's</span>
+                            <span className="text-sm text-slate-400">{phasePhotos.length} foto&apos;s</span>
                             {isExpanded ? (
                               <ChevronUp className="w-5 h-5 text-slate-400" />
                             ) : (
@@ -638,7 +638,7 @@ export default function BuilderProjectDetailPage() {
 
             {filteredPhotos.length === 0 && (
               <div className="text-center py-12 text-slate-500">
-                Geen foto's gevonden voor deze filter
+                Geen foto&apos;s gevonden voor deze filter
               </div>
             )}
           </div>
