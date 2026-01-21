@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Navigation } from '@/components/layout/navigation'
 
 export const metadata: Metadata = {
   title: 'Helder | Bouw uw droomhuis met complete transparantie',
@@ -17,5 +18,10 @@ export default function MarketingLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  return (
+    <>
+      <Navigation />
+      {children}
+    </>
+  )
 }

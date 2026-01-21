@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { SessionProvider } from '@/components/providers/session-provider'
+import { ToastProvider } from '@/components/ui/toast-provider'
+import { WalkthroughProvider } from '@/components/onboarding/WalkthroughProvider'
+import { KonamiCodeEasterEgg } from '@/components/fun/KonamiCode'
 import './globals.css'
 
 const inter = Inter({ 
@@ -83,7 +86,11 @@ export default function RootLayout({
     <html lang="nl" className={inter.variable}>
       <body className={`${inter.className} antialiased`}>
         <SessionProvider>
-          {children}
+          <WalkthroughProvider>
+            {children}
+            <ToastProvider />
+            <KonamiCodeEasterEgg />
+          </WalkthroughProvider>
         </SessionProvider>
       </body>
     </html>

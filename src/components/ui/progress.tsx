@@ -1,3 +1,7 @@
+'use client'
+
+import { motion } from 'framer-motion'
+
 interface ProgressProps {
   value: number
   max?: number
@@ -5,6 +9,7 @@ interface ProgressProps {
   variant?: 'default' | 'success' | 'warning'
   size?: 'sm' | 'md' | 'lg'
   showLabel?: boolean
+  animate?: boolean
 }
 
 export function Progress({
@@ -14,6 +19,7 @@ export function Progress({
   variant = 'default',
   size = 'md',
   showLabel = false,
+  animate = true,
 }: ProgressProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
 
@@ -34,14 +40,31 @@ export function Progress({
       {showLabel && (
         <div className="flex justify-between text-sm mb-1">
           <span>Voortgang</span>
-          <span className="font-medium">{Math.round(percentage)}%</span>
+          <motion.span 
+            className="font-medium"
+            key={percentage}
+            initial={animate ? { opacity: 0, y: -5 } : undefined}
+            animate={animate ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.2 }}
+          >
+            {Math.round(percentage)}%
+          </motion.span>
         </div>
       )}
       <div className={`bg-gray-200 rounded-full overflow-hidden ${sizes[size]}`}>
-        <div
-          className={`h-full rounded-full transition-all duration-300 ${variants[variant]}`}
-          style={{ width: `${percentage}%` }}
-        />
+        {animate ? (
+          <motion.div
+            className={`h-full rounded-full ${variants[variant]}`}
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          />
+        ) : (
+          <div
+            className={`h-full rounded-full transition-all duration-300 ${variants[variant]}`}
+            style={{ width: `${percentage}%` }}
+          />
+        )}
       </div>
     </div>
   )

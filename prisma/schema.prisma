@@ -54,6 +54,9 @@ model Company {
   Certification Certification[]
   Project       Project[]
   User          User[]
+  WhatsAppNumber         WhatsAppNumber[]
+  NotificationPreference NotificationPreference[]
+  TeamMember             TeamMember[]
 }
 
 model CostBreakdown {
@@ -91,11 +94,15 @@ model Document {
   phaseId         String?
   timelineEventId String?
   uploadedById    String
+  source          DocumentSource @default(MANUAL)
   ProjectPhase    ProjectPhase?  @relation(fields: [phaseId], references: [id])
   Project         Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   Property        Property?      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   TimelineEvent   TimelineEvent? @relation(fields: [timelineEventId], references: [id])
   User            User           @relation(fields: [uploadedById], references: [id])
+  WhatsAppMessage WhatsAppMessage[]
+  Issue           Issue[]
+  VoiceNote       VoiceNote[]
 
   @@index([projectId])
   @@index([propertyId])
@@ -173,6 +180,11 @@ model Project {
   ProjectContractor ProjectContractor[]
   ProjectPhase      ProjectPhase[]
   TimelineEvent     TimelineEvent[]
+  WhatsAppNumber         WhatsAppNumber[]
+  WhatsAppMessage        WhatsAppMessage[]
+  NotificationPreference NotificationPreference[]
+  Issue                  Issue[]
+  VoiceNote              VoiceNote[]
 
   @@index([companyId])
   @@index([propertyId])
@@ -337,6 +349,42 @@ model User {
   Session         Session[]
   TimelineEvent   TimelineEvent[]
   Company         Company?        @relation(fields: [companyId], references: [id])
+  Notification    Notification[]
+}
+
+// ============================================
+// In-App Notifications
+// ============================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  link      String?          // Optional link to navigate to
+  metadata  Json?            // Additional data (e.g., project ID, document ID)
+  createdAt DateTime         @default(now())
+  User      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+}
+
+enum NotificationType {
+  DOCUMENT_UPLOADED
+  DOCUMENT_VERIFIED
+  PHASE_COMPLETED
+  PHASE_STARTED
+  ISSUE_DETECTED
+  ISSUE_RESOLVED
+  MESSAGE_RECEIVED
+  SHARE_LINK_CREATED
+  MILESTONE_REACHED
+  MAINTENANCE_DUE
+  SYSTEM
 }
 
 enum CompanyType {
@@ -350,11 +398,15 @@ enum CompanyType {
 
 enum ConstructionPhase {
   GRONDWERK
+  FUNDERING
   RUWBOUW
-  DAK_GEVEL
+  DAKCONSTRUCTIE
+  GEVELWERK
   INSTALLATIES
   AFBOUW
   OPLEVERING
+  // Legacy (kept for backward compatibility)
+  DAK_GEVEL @map("DAK_GEVEL")
 }
 
 enum CostCategory {
@@ -369,6 +421,14 @@ enum CostCategory {
   GARDEN
   FEES
   OTHER
+}
+
+enum DocumentSource {
+  MANUAL
+  WHATSAPP
+  SMART_GLASSES
+  EMAIL
+  API
 }
 
 enum DocumentType {
@@ -412,17 +472,24 @@ enum EnergyLabel {
 
 enum EventType {
   CONSTRUCTION_START
+  FOUNDATION_START
   FOUNDATION_COMPLETE
   FRAMING_COMPLETE
+  ROOFING_START
   ROOFING_COMPLETE
+  EXTERIOR_COMPLETE
+  WINDOWS_INSTALLED
   ELECTRICAL_COMPLETE
   PLUMBING_COMPLETE
+  SYSTEMS_INSTALLED
   INSULATION_COMPLETE
   DRYWALL_COMPLETE
   PAINTING_COMPLETE
   FLOORING_COMPLETE
+  INTERIOR_COMPLETE
   FINAL_INSPECTION
   HANDOVER
+  PHASE_TRANSITION
   MAINTENANCE_PERFORMED
   INSPECTION_COMPLETED
   REPAIR_COMPLETED
@@ -552,4 +619,186 @@ enum UserRole {
   INSPECTOR
   MUNICIPALITY
   ADMIN
+}
+
+// ============================================
+// WhatsApp B2B Integration
+// ============================================
+
+model WhatsAppNumber {
+  id           String    @id @default(cuid())
+  phoneNumber  String    @unique // E.164 format: +31612345678
+  companyId    String
+  projectId    String?   // Optional: link to specific project
+  verified     Boolean   @default(false)
+  verifiedAt   DateTime?
+  verifyCode   String?   // 6-digit verification code
+  verifyExpiry DateTime? // Code expiry time
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  company  Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  project  Project?          @relation(fields: [projectId], references: [id])
+  messages WhatsAppMessage[]
+
+  @@index([companyId])
+  @@index([projectId])
+}
+
+model WhatsAppMessage {
+  id              String           @id @default(cuid())
+  twilioMessageId String           @unique // Twilio SID
+  fromPhone       String
+  toPhone         String
+  direction       MessageDirection
+  content         String?          // Text content
+  mediaUrl        String?          // Original Twilio media URL
+  mediaType       String?          // image/jpeg, video/mp4, etc.
+  status          MessageStatus    @default(RECEIVED)
+
+  // Link to created document (if media was processed)
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id])
+
+  // Link to sender
+  whatsappNumberId String?
+  whatsappNumber   WhatsAppNumber? @relation(fields: [whatsappNumberId], references: [id])
+
+  // Link to project (derived from whatsappNumber or explicit)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+
+  metadata    Json?     // Raw Twilio payload
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([fromPhone])
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+model NotificationPreference {
+  id        String @id @default(cuid())
+  companyId String
+  projectId String
+
+  whatsappEnabled Boolean @default(true)
+  emailEnabled    Boolean @default(true)
+
+  // What to notify about
+  notifyPhaseChange   Boolean @default(true)
+  notifyDocumentAdded Boolean @default(false)
+  notifyMilestone     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, projectId])
+}
+
+// ============================================
+// Issue Tracker
+// ============================================
+
+model Issue {
+  id          String    @id @default(cuid())
+  projectId   String
+  documentId  String?   // Source photo that detected the issue
+  title       String
+  description String?
+  severity    String    @default("medium") // low, medium, high, critical
+  status      String    @default("open")   // open, in_progress, resolved, dismissed
+  assignedTo  String?   // Builder/subcontractor name or ID
+  phase       String?   // Construction phase when detected
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  resolvedAt  DateTime?
+
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  document Document? @relation(fields: [documentId], references: [id])
+  mentions Mention[]
+
+  @@index([projectId])
+  @@index([status])
+  @@index([severity])
+}
+
+// ============================================
+// Team Member & Mentions
+// ============================================
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  companyId   String
+  name        String
+  role        String?  // Metselaar, Elektricien, Timmerman, etc.
+  phone       String?  // For WhatsApp notifications (E.164 format)
+  email       String?
+  specialties String[] // Array of skills/trades
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  mentions Mention[]
+
+  @@index([companyId])
+  @@index([role])
+  @@index([active])
+}
+
+model Mention {
+  id           String    @id @default(cuid())
+  issueId      String
+  teamMemberId String
+  notified     Boolean   @default(false)
+  notifiedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  issue      Issue      @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  teamMember TeamMember @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+
+  @@unique([issueId, teamMemberId])
+  @@index([issueId])
+  @@index([teamMemberId])
+  @@index([notified])
+}
+
+enum MessageDirection {
+  INCOMING
+  OUTGOING
+}
+
+enum MessageStatus {
+  RECEIVED
+  PROCESSING
+  PROCESSED
+  FAILED
+  SENT
+  DELIVERED
+  READ
+}
+
+// ============================================
+// Voice Notes
+// ============================================
+
+model VoiceNote {
+  id            String    @id @default(cuid())
+  projectId     String
+  documentId    String?   // Link to photo if voice describes a photo
+  audioUrl      String    // Stored audio file path
+  transcription String?   @db.Text
+  duration      Int?      // Duration in seconds
+  createdAt     DateTime  @default(now())
+  createdBy     String?   // Phone number or user identifier
+
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  document Document? @relation(fields: [documentId], references: [id])
+
+  @@index([projectId])
+  @@index([createdAt])
 }

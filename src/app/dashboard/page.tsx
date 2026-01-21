@@ -91,7 +91,7 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <div className="p-6 lg:p-8 space-y-8">
         {/* Hero Property Card */}
-        <div className="relative overflow-hidden bg-slate-900">
+        <div data-tour="dashboard-hero" className="relative overflow-hidden bg-slate-900">
           {/* Subtle grid */}
           <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: `linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)`,

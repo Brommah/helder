@@ -7,8 +7,37 @@ import Link from 'next/link'
 import { Logo } from '@/components/ui/logo'
 import {
   Mail, Lock, Eye, EyeOff, ArrowRight, Shield,
-  CheckCircle2, Sparkles, ChevronRight, AlertCircle, Loader2
+  CheckCircle2, Sparkles, ChevronRight, AlertCircle, Loader2,
+  Home, HardHat, UserCog
 } from 'lucide-react'
+
+// Quick login accounts for development
+const QUICK_LOGINS = [
+  { 
+    role: 'Eigenaar', 
+    email: 'completed@helder.nl', 
+    password: 'Demo1234!',
+    icon: Home, 
+    color: 'bg-emerald-500',
+    redirect: '/dashboard'
+  },
+  { 
+    role: 'Bouwer', 
+    email: 'builder@woningpaspoort.nl', 
+    password: 'Demo1234!',
+    icon: HardHat, 
+    color: 'bg-amber-500',
+    redirect: '/builder/dashboard'
+  },
+  { 
+    role: 'Admin', 
+    email: 'admin@woningpaspoort.nl', 
+    password: 'Demo1234!',
+    icon: UserCog, 
+    color: 'bg-violet-500',
+    redirect: '/dashboard'
+  },
+]
 
 function LoginForm() {
   const router = useRouter()
@@ -37,6 +66,30 @@ function LoginForm() {
         setError(result.error)
       } else {
         router.push(callbackUrl as '/dashboard')
+        router.refresh()
+      }
+    } catch {
+      setError('Er is iets misgegaan')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleQuickLogin = async (account: typeof QUICK_LOGINS[0]) => {
+    setError('')
+    setIsLoading(true)
+
+    try {
+      const result = await signIn('credentials', {
+        email: account.email,
+        password: account.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        router.push(account.redirect)
         router.refresh()
       }
     } catch {
@@ -122,13 +175,12 @@ function LoginForm() {
             />
             <span className="text-sm text-slate-600 font-medium">Onthoud mij</span>
           </label>
-          <button
-            type="button"
-            onClick={() => alert('Neem contact op voor wachtwoord reset')}
-            className="text-sm font-bold text-[#93b9e6] hover:text-slate-900 transition-colors uppercase tracking-wide"
-          >
-            Vergeten?
-          </button>
+                        <Link
+                          href="/auth/reset-password"
+                          className="text-sm font-bold text-[#93b9e6] hover:text-slate-900 transition-colors uppercase tracking-wide"
+                        >
+                          Vergeten?
+                        </Link>
         </div>
 
         <button
@@ -161,22 +213,41 @@ function LoginForm() {
         </Link>
       </p>
 
-      {/* Demo access */}
+      {/* Quick Login for Development */}
       <div className="mt-8 p-6 bg-slate-50 border-l-4 border-[#93b9e6]">
-        <div className="flex items-center gap-2 text-slate-900 mb-2">
+        <div className="flex items-center gap-2 text-slate-900 mb-3">
           <Sparkles className="w-4 h-4 text-[#93b9e6]" />
-          <span className="font-black text-sm uppercase tracking-wider">Demo toegang</span>
+          <span className="font-black text-sm uppercase tracking-wider">Snelle toegang</span>
         </div>
-        <p className="text-sm text-slate-600 mb-3">
-          Bekijk een voorbeeldpaspoort zonder in te loggen
+        <p className="text-sm text-slate-600 mb-4">
+          Log direct in als een van de demo accounts
         </p>
-        <Link
-          href="/share/demo"
-          className="inline-flex items-center gap-2 text-sm font-bold text-[#93b9e6] hover:text-slate-900 transition-colors uppercase tracking-wide"
-        >
-          Bekijk demo
-          <ChevronRight className="w-4 h-4" />
-        </Link>
+        <div className="flex gap-2">
+          {QUICK_LOGINS.map((account) => {
+            const Icon = account.icon
+            return (
+              <button
+                key={account.email}
+                onClick={() => handleQuickLogin(account)}
+                disabled={isLoading}
+                className={`group flex items-center gap-2 px-4 py-2.5 ${account.color} text-white text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-all disabled:opacity-50`}
+                title={`Login als ${account.role}`}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{account.role}</span>
+              </button>
+            )
+          })}
+        </div>
+        <div className="mt-4 pt-4 border-t border-slate-200">
+          <Link
+            href="/share/demo"
+            className="inline-flex items-center gap-2 text-sm font-bold text-[#93b9e6] hover:text-slate-900 transition-colors uppercase tracking-wide"
+          >
+            Of bekijk demo zonder login
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
     </div>
   )

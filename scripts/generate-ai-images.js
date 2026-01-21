@@ -7,7 +7,11 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const API_KEY = 'AIzaSyCTKCGdOJ8FxaBRLbOUKGlSZhLRQL7-uno';
+const API_KEY = process.env.GEMINI_API_KEY;
+if (!API_KEY) {
+  console.error('❌ GEMINI_API_KEY required. Get one at: https://aistudio.google.com/app/apikey');
+  process.exit(1);
+}
 const MODEL = 'gemini-3-pro-image-preview';
 
 const outputDir = path.join(__dirname, '..', 'public', 'images', 'ai');

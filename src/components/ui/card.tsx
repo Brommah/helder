@@ -1,17 +1,40 @@
-import { HTMLAttributes, forwardRef } from 'react'
+'use client'
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {}
+import { HTMLAttributes, forwardRef } from 'react'
+import { motion, HTMLMotionProps } from 'framer-motion'
+
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  animate?: boolean
+  hover?: boolean
+}
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className = '', children, ...props }, ref) => {
+  ({ className = '', animate = false, hover = false, children, ...props }, ref) => {
+    const baseClass = `bg-white rounded-xl shadow-sm border border-gray-100 ${className}`
+    
+    if (!animate && !hover) {
+      return (
+        <div ref={ref} className={baseClass} {...props}>
+          {children}
+        </div>
+      )
+    }
+
     return (
-      <div
+      <motion.div
         ref={ref}
-        className={`bg-white rounded-xl shadow-sm border border-gray-100 ${className}`}
-        {...props}
+        className={baseClass}
+        initial={animate ? { opacity: 0, y: 20 } : undefined}
+        animate={animate ? { opacity: 1, y: 0 } : undefined}
+        transition={{ duration: 0.3 }}
+        whileHover={hover ? { 
+          y: -4, 
+          boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' 
+        } : undefined}
+        {...(props as HTMLMotionProps<'div'>)}
       >
         {children}
-      </div>
+      </motion.div>
     )
   }
 )

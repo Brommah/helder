@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Logo } from '@/components/ui/logo'
-import { Footer, Navigation } from '@/components/layout'
+import { Footer } from '@/components/layout'
 import { 
   Building2, MapPin, ArrowRight, ChevronRight, Zap, Home,
   Ruler, Euro, Calendar, Users, Star, Quote, Filter,
@@ -157,8 +157,6 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Navigation */}
-      <Navigation variant="solid" />
 
       <main className="pt-20">
         {/* Hero */}

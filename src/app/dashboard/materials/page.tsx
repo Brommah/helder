@@ -1,12 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { 
+import { useState, useEffect } from 'react'
+import {
   Package, Search, Filter, Grid3X3, List, ChevronDown, ChevronRight,
   Layers, Droplets, Thermometer, Zap, Home, Shield, CheckCircle2,
   ExternalLink, Info, Tag, Calendar, MapPin, FileText, Lock,
-  Building2, Hammer, Wind, Sun
+  Building2, Hammer, Wind, Sun, Sparkles, MessageCircle, Download
 } from 'lucide-react'
+
+// AI-detected material from WhatsApp
+interface AIMaterial {
+  name: string
+  type?: string
+  brand?: string
+  color?: string
+  dimensions?: string
+  totalQuantity: string
+  occurrences: number
+  firstSeen: string
+  lastSeen: string
+  phase: string
+  documents: { id: string; name: string; date: string }[]
+}
 
 interface Material {
   id: string
@@ -148,6 +163,33 @@ export default function MaterialsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [expandedMaterial, setExpandedMaterial] = useState<string | null>(null)
 
+  // AI-detected materials from WhatsApp
+  const [aiMaterials, setAiMaterials] = useState<AIMaterial[]>([])
+  const [aiStats, setAiStats] = useState<{ totalMaterials: number; totalDocuments: number; phases: number } | null>(null)
+  const [loadingAI, setLoadingAI] = useState(true)
+
+  useEffect(() => {
+    async function fetchAIMaterials() {
+      try {
+        const res = await fetch('/api/materials?projectId=proj_villa_zonneweide_ams')
+        if (res.ok) {
+          const data = await res.json()
+          setAiMaterials(data.materials || [])
+          setAiStats(data.stats || null)
+        }
+      } catch (err) {
+        console.error('Failed to fetch AI materials:', err)
+      } finally {
+        setLoadingAI(false)
+      }
+    }
+    fetchAIMaterials()
+  }, [])
+
+  const handleGenerateReport = () => {
+    window.open('/api/reports/progress?projectId=proj_villa_zonneweide_ams&format=html', '_blank')
+  }
+
   const filteredMaterials = MATERIALS.filter(mat => {
     const matchesCategory = selectedCategory === 'all' || mat.category === selectedCategory
     const matchesSearch = mat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -171,6 +213,13 @@ export default function MaterialsPage() {
               Complete DNA van alle bouwmaterialen in uw woning
             </p>
           </div>
+          <button
+            onClick={handleGenerateReport}
+            className="flex items-center gap-2 px-5 py-3 bg-[#1a1a2e] text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-[#1a1a2e]/20 transition-all duration-200"
+          >
+            <Download className="w-5 h-5" />
+            RAPPORT GENEREREN
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -315,6 +364,52 @@ export default function MaterialsPage() {
             </p>
           </div>
         )}
+
+        {/* AI-Detected Materials from WhatsApp */}
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-[#1a1a2e]">AI-Gedetecteerde Materialen</h2>
+              <p className="text-sm text-slate-500 flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Automatisch herkend uit WhatsApp foto&apos;s
+              </p>
+            </div>
+            {aiStats && (
+              <div className="ml-auto flex items-center gap-4 text-sm text-slate-500">
+                <span>{aiStats.totalDocuments} foto&apos;s geanalyseerd</span>
+                <span>•</span>
+                <span>{aiStats.totalMaterials} materialen gevonden</span>
+              </div>
+            )}
+          </div>
+
+          {loadingAI ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center">
+              <div className="animate-spin w-8 h-8 border-4 border-violet-200 border-t-violet-600 rounded-full mx-auto mb-4"></div>
+              <p className="text-slate-500">AI materialen laden...</p>
+            </div>
+          ) : aiMaterials.length === 0 ? (
+            <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl border border-violet-200 p-8 text-center">
+              <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-8 h-8 text-violet-400" />
+              </div>
+              <h3 className="font-semibold text-[#1a1a2e] mb-2">Nog geen materialen gedetecteerd</h3>
+              <p className="text-slate-500 text-sm max-w-md mx-auto">
+                Stuur bouwfoto&apos;s via WhatsApp naar het project en de AI herkent automatisch materialen, merken en specificaties.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {aiMaterials.map((mat, idx) => (
+                <AIMaterialCard key={`${mat.name}-${idx}`} material={mat} index={idx} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <style jsx global>{`
@@ -462,7 +557,7 @@ function MaterialRow({ material, index }: { material: Material; index: number })
   const CategoryIcon = categoryIcon
 
   return (
-    <div 
+    <div
       className="flex items-center gap-4 p-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors"
       style={{ animationDelay: `${index * 30}ms` }}
     >
@@ -488,6 +583,111 @@ function MaterialRow({ material, index }: { material: Material; index: number })
         {material.warrantyYears} jaar
       </div>
       <ChevronRight className="w-5 h-5 text-slate-400" />
+    </div>
+  )
+}
+
+function AIMaterialCard({ material, index }: { material: AIMaterial; index: number }) {
+  const [expanded, setExpanded] = useState(false)
+
+  const formatDate = (iso: string) => new Date(iso).toLocaleDateString('nl-NL', {
+    day: 'numeric',
+    month: 'short',
+  })
+
+  return (
+    <div
+      className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${
+        expanded
+          ? 'border-violet-300 shadow-xl shadow-violet-100/50'
+          : 'border-slate-200 hover:border-violet-200 hover:shadow-lg'
+      }`}
+      style={{ animationDelay: `${index * 50}ms` }}
+    >
+      <div className="p-5">
+        {/* Header with AI badge */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-violet-100 to-purple-100 rounded-xl flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-violet-600" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-1 bg-violet-100 text-violet-700 text-xs font-medium rounded-lg">
+              {material.occurrences}x gezien
+            </span>
+          </div>
+        </div>
+
+        {/* Material name */}
+        <h3 className="font-bold text-[#1a1a2e] mb-1">{material.name}</h3>
+        {material.brand && (
+          <p className="text-sm text-slate-500 mb-3">{material.brand}{material.type ? ` • ${material.type}` : ''}</p>
+        )}
+
+        {/* Quick info */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {material.totalQuantity && material.totalQuantity !== '-' && (
+            <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-lg">
+              {material.totalQuantity}
+            </span>
+          )}
+          {material.color && (
+            <span className="px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-lg">
+              {material.color}
+            </span>
+          )}
+          {material.dimensions && (
+            <span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg">
+              {material.dimensions}
+            </span>
+          )}
+        </div>
+
+        {/* Phase */}
+        <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
+          <Hammer className="w-4 h-4" />
+          <span>{material.phase}</span>
+        </div>
+
+        {/* Expand button */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center justify-center gap-2 py-2.5 border-t border-slate-100 text-sm font-medium text-slate-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg -mx-5 px-5 mt-2 transition-all"
+        >
+          <span>{expanded ? 'Verbergen' : "Foto's bekijken"}</span>
+          <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+
+      {/* Expanded: show documents */}
+      {expanded && (
+        <div className="px-5 pb-5 border-t border-slate-100 animate-fade-in">
+          <div className="pt-4">
+            <h4 className="text-sm font-semibold text-[#1a1a2e] mb-3">
+              Gedetecteerd in {material.documents.length} foto&apos;s
+            </h4>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {material.documents.slice(0, 5).map((doc) => (
+                <div key={doc.id} className="flex items-center justify-between py-2 px-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-slate-400" />
+                    <span className="text-sm text-slate-600 truncate max-w-[150px]">{doc.name}</span>
+                  </div>
+                  <span className="text-xs text-slate-400">{formatDate(doc.date)}</span>
+                </div>
+              ))}
+              {material.documents.length > 5 && (
+                <p className="text-xs text-slate-400 text-center py-2">
+                  +{material.documents.length - 5} meer foto&apos;s
+                </p>
+              )}
+            </div>
+            <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
+              <span>Eerste: {formatDate(material.firstSeen)}</span>
+              <span>Laatste: {formatDate(material.lastSeen)}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Navigation } from '@/components/layout/navigation'
 import { SharedFooter } from '@/components/layout/footer'
 import { FileText, ArrowLeft } from 'lucide-react'
 
@@ -11,7 +10,6 @@ export const metadata = {
 export default function VoorwaardenPage() {
   return (
     <div className="min-h-screen bg-slate-50">
-      <Navigation />
 
       {/* Hero */}
       <section className="pt-32 pb-16 bg-white border-b border-slate-200">

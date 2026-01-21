@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
 import { 
   ArrowRight, Shield,
@@ -73,9 +72,7 @@ function SectionLabel({ children, color = 'blue' }: { children: React.ReactNode;
 export default function WoningpaspoortPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
       <HeroSection />
-      <TestimonialsSection />
       <ProblemSection />
       <WhatIsItSection />
       <WhatsIncludedSection />
@@ -139,54 +136,6 @@ function HeroSection() {
   )
 }
 
-function TestimonialsSection() {
-  return (
-    <section className="py-20 lg:py-32 bg-emerald-500 relative overflow-hidden">
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Quote */}
-          <div>
-            <div className="text-6xl lg:text-8xl font-black text-white/20 mb-6">&quot;</div>
-            <p className="text-2xl lg:text-4xl font-bold text-white leading-tight mb-8">
-              De makelaar schatte €520.000. We verkochten voor{' '}
-              <span className="text-[#050507]">€615.000</span>.
-              Kopers vertrouwden ons direct door het complete dossier.
-            </p>
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full overflow-hidden">
-                <Image src="/images/avatars/family-1.jpg" alt="Familie" width={64} height={64} className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <div className="font-black text-white">FAMILIE VAN DEN BERG</div>
-                <div className="text-sm text-white/60">Almere, 8 jaar woningpaspoort</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/10 p-6 lg:p-8 backdrop-blur">
-              <div className="text-4xl lg:text-5xl font-black text-white">€95K</div>
-              <div className="text-xs font-bold text-white/60 uppercase tracking-wider mt-2">meer ontvangen</div>
-            </div>
-            <div className="bg-white/10 p-6 lg:p-8 backdrop-blur">
-              <div className="text-4xl lg:text-5xl font-black text-white">3</div>
-              <div className="text-xs font-bold text-white/60 uppercase tracking-wider mt-2">dagen verkocht</div>
-            </div>
-            <div className="bg-white/10 p-6 lg:p-8 backdrop-blur">
-              <div className="text-4xl lg:text-5xl font-black text-white">0</div>
-              <div className="text-xs font-bold text-white/60 uppercase tracking-wider mt-2">onderhandeling</div>
-            </div>
-            <div className="bg-white/10 p-6 lg:p-8 backdrop-blur">
-              <div className="text-4xl lg:text-5xl font-black text-white">20x</div>
-              <div className="text-xs font-bold text-white/60 uppercase tracking-wider mt-2">ROI</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
 
 function ProblemSection() {
   return (
@@ -296,37 +245,43 @@ function WhatsIncludedSection() {
       icon: FileText, 
       title: 'DOCUMENTEN', 
       items: ['Bouwtekeningen', 'Vergunningen', 'Certificaten', 'Handleidingen'],
-      count: '150+'
+      count: '150+',
+      bg: '/images/cards/card-bg-documenten.png'
     },
     { 
       icon: Receipt, 
       title: 'FACTUREN', 
       items: ['Aanschaf materialen', 'Installaties', 'Reparaties', 'Onderhoud'],
-      count: '200+'
+      count: '200+',
+      bg: '/images/cards/card-bg-facturen.png'
     },
     { 
       icon: Shield, 
       title: 'GARANTIES', 
       items: ['Apparaten', 'Installaties', 'Materialen', 'Werkzaamheden'],
-      count: '25+'
+      count: '25+',
+      bg: '/images/cards/card-bg-garanties.png'
     },
     { 
       icon: Users, 
       title: 'CONTACTEN', 
       items: ['Installateurs', 'Aannemers', 'Leveranciers', 'Specialisten'],
-      count: '15+'
+      count: '15+',
+      bg: '/images/cards/card-bg-contacten.png'
     },
     { 
       icon: Database, 
       title: 'MATERIALEN', 
       items: ['Verfkleuren', 'Vloerentypes', 'Tegelsoorten', 'Specificaties'],
-      count: '500+'
+      count: '500+',
+      bg: '/images/cards/card-bg-materialen.png'
     },
     { 
       icon: Calendar, 
       title: 'ONDERHOUD', 
       items: ['Historie', 'Planning', 'Herinneringen', 'Kosten'],
-      count: '∞'
+      count: '∞',
+      bg: '/images/cards/card-bg-onderhoud.png'
     },
   ]
 
@@ -343,20 +298,31 @@ function WhatsIncludedSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-1">
           {categories.map((cat, i) => (
-            <div key={i} className="bg-[#f5f5f5] p-8 hover:bg-[#050507] group transition-all duration-300">
-              <div className="flex items-start justify-between mb-6">
-                <cat.icon className="w-8 h-8 text-[#050507]/30 group-hover:text-[#93b9e6] transition-colors" />
-                <span className="text-3xl font-black text-[#050507]/20 group-hover:text-white/20">{cat.count}</span>
+            <div 
+              key={i} 
+              className="relative bg-[#f5f5f5] p-8 hover:bg-[#050507] group transition-all duration-300 overflow-hidden"
+            >
+              {/* Background image */}
+              <div 
+                className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${cat.bg})` }}
+              />
+              
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-6">
+                  <cat.icon className="w-8 h-8 text-[#050507]/30 group-hover:text-[#93b9e6] transition-colors" />
+                  <span className="text-3xl font-black text-[#050507]/20 group-hover:text-white/20">{cat.count}</span>
+                </div>
+                <h3 className="text-lg font-black text-[#050507] group-hover:text-white uppercase tracking-wider mb-4">{cat.title}</h3>
+                <ul className="space-y-2">
+                  {cat.items.map((item, j) => (
+                    <li key={j} className="text-sm text-[#050507]/50 group-hover:text-white/50 flex items-center gap-2">
+                      <div className="w-1 h-1 bg-current rounded-full" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <h3 className="text-lg font-black text-[#050507] group-hover:text-white uppercase tracking-wider mb-4">{cat.title}</h3>
-              <ul className="space-y-2">
-                {cat.items.map((item, j) => (
-                  <li key={j} className="text-sm text-[#050507]/50 group-hover:text-white/50 flex items-center gap-2">
-                    <div className="w-1 h-1 bg-current rounded-full" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
             </div>
           ))}
         </div>

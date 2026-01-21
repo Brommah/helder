@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
 import { 
   ArrowRight, Brain, Shield, Zap,
@@ -74,7 +73,6 @@ function SectionLabel({ children, color = 'blue' }: { children: React.ReactNode;
 export default function AIIntelligencePage() {
   return (
     <div className="min-h-screen bg-white">
-      <Navigation variant="transparent" />
       <HeroSection />
       <HowAIWorksSection />
       <PredictionsSection />

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
 import { Shield } from 'lucide-react'
 
@@ -11,7 +10,6 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
 
       {/* Hero */}
       <section className="pt-32 pb-16 bg-slate-50">

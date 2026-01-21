@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { Logo } from '@/components/ui/logo'
+import { NotificationBell } from '@/components/ui/notification-bell'
+import { QuickActions } from '@/components/QuickActions'
 import {
   Home, Clock, FileText, Package, Share2, Settings, LogOut,
-  Menu, X, ChevronRight, Bell, Shield, HelpCircle, Sparkles, Loader2, Euro, Brain, Lock, HardHat
+  Menu, X, ChevronRight, Bell, Shield, HelpCircle, Sparkles, Loader2, Euro, Brain, Lock, HardHat, AlertTriangle, Users
 } from 'lucide-react'
 
 // Property context to share property data across dashboard
@@ -84,18 +86,21 @@ export default function DashboardLayout({
 
   // Navigation items - AI is conditionally enabled
   const navigation = [
-    { href: '/dashboard' as const, icon: Home, label: 'OVERZICHT', exact: true },
-    { 
-      href: '/dashboard/ai' as const, 
-      icon: Brain, 
-      label: 'AI INTELLIGENCE', 
+    { href: '/dashboard' as const, icon: Home, label: 'OVERZICHT', exact: true, tourId: 'nav-overview' },
+    {
+      href: '/dashboard/ai' as const,
+      icon: Brain,
+      label: 'AI INTELLIGENCE',
       badge: property?.isCompleted ? 'LIVE' : undefined,
       disabled: !property?.isCompleted,
+      tourId: 'nav-ai',
     },
-    { href: '/dashboard/timeline' as const, icon: Clock, label: 'TIJDLIJN' },
-    { href: '/dashboard/documents' as const, icon: FileText, label: 'DOCUMENTEN' },
-    { href: '/dashboard/costs' as const, icon: Euro, label: 'KOSTEN' },
-    { href: '/dashboard/share' as const, icon: Share2, label: 'DELEN' },
+    { href: '/dashboard/timeline' as const, icon: Clock, label: 'TIJDLIJN', tourId: 'nav-timeline' },
+    { href: '/dashboard/documents' as const, icon: FileText, label: 'DOCUMENTEN', tourId: 'nav-documents' },
+    { href: '/dashboard/issues' as const, icon: AlertTriangle, label: 'PROBLEMEN', tourId: 'nav-issues' },
+    { href: '/dashboard/team' as const, icon: Users, label: 'TEAM', tourId: 'nav-team' },
+    { href: '/dashboard/costs' as const, icon: Euro, label: 'KOSTEN', tourId: 'nav-costs' },
+    { href: '/dashboard/share' as const, icon: Share2, label: 'DELEN', tourId: 'nav-share' },
   ]
 
   // Show loading state while checking auth
@@ -147,10 +152,7 @@ export default function DashboardLayout({
           
           <Logo size="sm" href="/dashboard" />
 
-          <button className="p-2 hover:bg-slate-100 transition-colors relative">
-            <Bell className="w-6 h-6 text-slate-600" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#93b9e6]" />
-          </button>
+          <NotificationBell variant="light" />
         </div>
       </header>
 
@@ -172,9 +174,7 @@ export default function DashboardLayout({
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between p-6 border-b border-white/10">
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <Logo size="md" href="/dashboard" />
-            </Link>
+            <Logo size="md" href="/dashboard" />
             <button 
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden p-2 hover:bg-white/10 transition-colors"
@@ -266,6 +266,7 @@ export default function DashboardLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
+                    data-tour={item.tourId}
                     className={`
                       group flex items-center gap-3 px-4 py-3 font-bold text-sm tracking-wider transition-all duration-200
                       ${active 
@@ -366,6 +367,9 @@ export default function DashboardLayout({
         <PropertyContext.Provider value={property}>
           {children}
         </PropertyContext.Provider>
+
+        {/* Quick Actions FAB */}
+        <QuickActions />
       </main>
     </div>
   )

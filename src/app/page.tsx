@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Logo } from '@/components/ui/logo'
+import { Navigation } from '@/components/layout/navigation'
 import { 
   ArrowRight, Check,
   FileText, Shield, Lock,
@@ -77,59 +78,6 @@ export default function HelderLandingPage() {
       <CTASection />
       <Footer />
     </div>
-  )
-}
-
-function Navigation() {
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-      scrolled ? 'bg-white/95 backdrop-blur-xl shadow-sm' : 'bg-transparent'
-    }`}>
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between h-16">
-          <Logo size="md" />
-          
-          <div className="hidden lg:flex items-center gap-6">
-            <a href="#werkwijze" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider">
-              <Sparkles className="w-4 h-4" />
-              Werkwijze
-            </a>
-            <Link href="/woningpaspoort" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider">
-              <Shield className="w-4 h-4" />
-              Woningpaspoort
-            </Link>
-            <Link href="/ai-intelligence" className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider">
-              <Brain className="w-4 h-4" />
-              AI
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link href="/auth/login" className="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider">
-              <Lock className="w-4 h-4" />
-              Login
-            </Link>
-            <Link 
-              href="/assessment" 
-              className="group px-5 py-2.5 bg-slate-900 text-white text-xs font-black uppercase tracking-wider hover:bg-[#93b9e6] transition-colors"
-            >
-              <span className="flex items-center gap-2">
-                Start
-                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </nav>
   )
 }
 
@@ -246,19 +194,22 @@ function ServicesSection() {
       icon: Shield,
       title: 'WONINGPASPOORT',
       description: 'Uw complete huis-DNA. Elk document, elke factuur, elke garantie. 20 jaar bewaard en blockchain-beveiligd.',
-      link: '/woningpaspoort' as const
+      link: '/woningpaspoort' as const,
+      bg: '/images/cards/card-bg-woningpaspoort-service.png'
     },
     {
       icon: Brain,
       title: 'AI INTELLIGENCE',
       description: 'Voorspellend onderhoud, energieoptimalisatie en slimme aanbevelingen. Bespaar tot €5.640 per jaar.',
-      link: '/ai-intelligence' as const
+      link: '/ai-intelligence' as const,
+      bg: '/images/cards/card-bg-ai-service.png'
     },
     {
       icon: FileText,
       title: 'WKB COMPLIANT',
       description: 'Automatische archivering volgens de Wet kwaliteitsborging. Altijd up-to-date, altijd compliant.',
-      link: '/woningpaspoort' as const
+      link: '/woningpaspoort' as const,
+      bg: '/images/cards/card-bg-wkb-service.png'
     },
   ]
 
@@ -280,15 +231,21 @@ function ServicesSection() {
               <Link 
                 key={service.title} 
                 href={service.link}
-                className="bg-white p-12 lg:p-16 group hover:bg-slate-50 transition-all duration-300"
+                className="relative bg-white p-12 lg:p-16 group hover:bg-slate-50 transition-all duration-300 overflow-hidden"
               >
-                <Icon className="w-12 h-12 text-[#93b9e6] mb-8" />
-                <h3 className="text-xl font-black text-slate-900 mb-4 tracking-wider">{service.title}</h3>
-                <p className="text-slate-500 leading-relaxed mb-6">{service.description}</p>
-                <span className="text-[#93b9e6] font-black uppercase tracking-wider text-sm flex items-center gap-2 group-hover:gap-4 transition-all">
-                  MEER INFO
-                  <ArrowRight className="w-4 h-4" />
-                </span>
+                <div 
+                  className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat"
+                  style={{ backgroundImage: `url(${service.bg})` }}
+                />
+                <div className="relative z-10">
+                  <Icon className="w-12 h-12 text-[#93b9e6] mb-8" />
+                  <h3 className="text-xl font-black text-slate-900 mb-4 tracking-wider">{service.title}</h3>
+                  <p className="text-slate-500 leading-relaxed mb-6">{service.description}</p>
+                  <span className="text-[#93b9e6] font-black uppercase tracking-wider text-sm flex items-center gap-2 group-hover:gap-4 transition-all">
+                    MEER INFO
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
               </Link>
             )
           })}
@@ -351,10 +308,10 @@ function WoningpaspoortSection() {
           </div>
 
           <div className="relative">
-            <div className="aspect-[4/3] relative overflow-hidden bg-slate-200">
+            <div className="aspect-[4/3] relative overflow-hidden rounded-3xl">
               <Image 
-                src="/images/woningpaspoort-mockup.jpg"
-                alt="Woningpaspoort interface"
+                src="/images/house-dna-friendly.jpg"
+                alt="Uw huis-DNA - alles vindbaar en georganiseerd"
                 fill
                 className="object-cover"
               />
@@ -443,32 +400,44 @@ function AISection() {
               </div>
 
               {/* Feature cards */}
-              <div className="bg-slate-900 p-6 lg:p-8 border-r border-b border-white/10">
-                <Cpu className="w-8 h-8 text-[#93b9e6] mb-4" />
-                <div className="text-2xl font-black text-white mb-1">3 maanden</div>
-                <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">VOORUIT PLANNEN</div>
-                <p className="text-sm text-white/40">AI voorspelt problemen voordat ze ontstaan</p>
+              <div className="relative bg-slate-900 p-6 lg:p-8 border-r border-b border-white/10 group overflow-hidden">
+                <div className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(/images/cards/card-bg-ai-planning.png)` }} />
+                <div className="relative z-10">
+                  <Cpu className="w-8 h-8 text-[#93b9e6] mb-4" />
+                  <div className="text-2xl font-black text-white mb-1">3 maanden</div>
+                  <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">VOORUIT PLANNEN</div>
+                  <p className="text-sm text-white/40">AI voorspelt problemen voordat ze ontstaan</p>
+                </div>
               </div>
 
-              <div className="bg-slate-900 p-6 lg:p-8 border-b border-white/10">
-                <Zap className="w-8 h-8 text-[#93b9e6] mb-4" />
-                <div className="text-2xl font-black text-white mb-1">-32%</div>
-                <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">ENERGIEKOSTEN</div>
-                <p className="text-sm text-white/40">Door slimme optimalisatie</p>
+              <div className="relative bg-slate-900 p-6 lg:p-8 border-b border-white/10 group overflow-hidden">
+                <div className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(/images/cards/card-bg-ai-energy.png)` }} />
+                <div className="relative z-10">
+                  <Zap className="w-8 h-8 text-[#93b9e6] mb-4" />
+                  <div className="text-2xl font-black text-white mb-1">-32%</div>
+                  <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">ENERGIEKOSTEN</div>
+                  <p className="text-sm text-white/40">Door slimme optimalisatie</p>
+                </div>
               </div>
 
-              <div className="bg-slate-900 p-6 lg:p-8 border-r border-white/10">
-                <Bell className="w-8 h-8 text-[#93b9e6] mb-4" />
-                <div className="text-2xl font-black text-white mb-1">24/7</div>
-                <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">MONITORING</div>
-                <p className="text-sm text-white/40">Altijd waakzaam over uw woning</p>
+              <div className="relative bg-slate-900 p-6 lg:p-8 border-r border-white/10 group overflow-hidden">
+                <div className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(/images/cards/card-bg-ai-monitoring.png)` }} />
+                <div className="relative z-10">
+                  <Bell className="w-8 h-8 text-[#93b9e6] mb-4" />
+                  <div className="text-2xl font-black text-white mb-1">24/7</div>
+                  <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">MONITORING</div>
+                  <p className="text-sm text-white/40">Altijd waakzaam over uw woning</p>
+                </div>
               </div>
 
-              <div className="bg-slate-900 p-6 lg:p-8">
-                <TrendingUp className="w-8 h-8 text-[#93b9e6] mb-4" />
-                <div className="text-2xl font-black text-white mb-1">+23%</div>
-                <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">WONINGWAARDE</div>
-                <p className="text-sm text-white/40">Hogere verkoopprijs door AI-inzichten</p>
+              <div className="relative bg-slate-900 p-6 lg:p-8 group overflow-hidden">
+                <div className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(/images/cards/card-bg-ai-value.png)` }} />
+                <div className="relative z-10">
+                  <TrendingUp className="w-8 h-8 text-[#93b9e6] mb-4" />
+                  <div className="text-2xl font-black text-white mb-1">+23%</div>
+                  <div className="text-[10px] font-black text-white/30 uppercase tracking-wider mb-2">WONINGWAARDE</div>
+                  <p className="text-sm text-white/40">Hogere verkoopprijs door AI-inzichten</p>
+                </div>
               </div>
             </div>
           </div>
@@ -480,10 +449,10 @@ function AISection() {
 
 function ProcessSection() {
   const steps = [
-    { num: '01', title: 'ASSESSMENT', desc: 'Ontdek in 3 minuten of bouwen bij u past', icon: Sparkles, image: '/images/discover-step.jpg' },
-    { num: '02', title: 'ONTWERP', desc: 'Uw wensen worden werkelijkheid op papier', icon: Eye, image: '/images/design-step.jpg' },
-    { num: '03', title: 'BOUW', desc: 'Transparant proces met live updates', icon: Home, image: '/images/build-step.jpg' },
-    { num: '04', title: 'OPLEVERING', desc: 'Compleet Woningpaspoort voor altijd', icon: Shield, image: '/images/handover-step.jpg' },
+    { num: '01', title: 'ASSESSMENT', desc: 'Ontdek in 3 minuten of bouwen bij u past', icon: Sparkles, bg: '/images/cards/card-bg-step-assessment.png' },
+    { num: '02', title: 'ONTWERP', desc: 'Uw wensen worden werkelijkheid op papier', icon: Eye, bg: '/images/cards/card-bg-step-design.png' },
+    { num: '03', title: 'BOUW', desc: 'Transparant proces met live updates', icon: Home, bg: '/images/cards/card-bg-step-build.png' },
+    { num: '04', title: 'OPLEVERING', desc: 'Compleet Woningpaspoort voor altijd', icon: Shield, bg: '/images/cards/card-bg-step-handover.png' },
   ]
 
   return (
@@ -502,15 +471,11 @@ function ProcessSection() {
             const Icon = step.icon
             return (
               <div key={step.num} className="bg-white p-8 lg:p-12 group hover:bg-slate-50 transition-all duration-300 relative overflow-hidden">
-                {/* Background image with overlay */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500">
-                  <Image 
-                    src={step.image}
-                    alt={step.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                {/* Background image */}
+                <div 
+                  className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat"
+                  style={{ backgroundImage: `url(${step.bg})` }}
+                />
                 <div className="relative z-10">
                   <div className="text-6xl lg:text-8xl font-black text-slate-100 group-hover:text-[#93b9e6]/20 transition-colors mb-6">{step.num}</div>
                   <Icon className="w-8 h-8 text-[#93b9e6] mb-6" />
@@ -542,19 +507,22 @@ function TestimonialsSection() {
       quote: 'Het Woningpaspoort was doorslaggevend bij de verkoop. Kopers wisten precies wat ze kochten.',
       author: 'Familie De Vries',
       location: 'Almere',
-      result: '+€127K'
+      result: '+€127K',
+      bg: '/images/cards/card-bg-testimonial-1.png'
     },
     {
       quote: 'De AI voorspelde een lekkage voordat we er iets van merkten. Dat heeft ons duizenden bespaard.',
       author: 'Mark & Lisa',
       location: 'Utrecht',
-      result: '€8.400'
+      result: '€8.400',
+      bg: '/images/cards/card-bg-testimonial-2.png'
     },
     {
       quote: 'Eindelijk een bouwer die doet wat ze beloven. Elke factuur, elk materiaal, alles gedocumenteerd.',
       author: 'Familie Jansen',
       location: 'Den Haag',
-      result: '100%'
+      result: '100%',
+      bg: '/images/cards/card-bg-testimonial-3.png'
     },
   ]
 
@@ -571,14 +539,20 @@ function TestimonialsSection() {
 
         <div className="grid md:grid-cols-3 gap-px bg-slate-200">
           {testimonials.map((t, i) => (
-            <div key={i} className="bg-white p-8 lg:p-12 group hover:bg-slate-50 transition-all duration-300">
-              <div className="text-4xl lg:text-5xl font-black text-[#93b9e6] mb-4">{t.result}</div>
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">BESPAARD / VERDIEND</div>
-              <Quote className="w-8 h-8 text-slate-200 mb-4" />
-              <p className="text-slate-600 mb-8 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-              <div>
-                <p className="font-black text-slate-900">{t.author}</p>
-                <p className="text-sm text-slate-400">{t.location}</p>
+            <div key={i} className="relative bg-white p-8 lg:p-12 group hover:bg-slate-50 transition-all duration-300 overflow-hidden">
+              <div 
+                className="absolute inset-0 opacity-30 group-hover:opacity-20 transition-opacity bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${t.bg})` }}
+              />
+              <div className="relative z-10">
+                <div className="text-4xl lg:text-5xl font-black text-[#93b9e6] mb-4">{t.result}</div>
+                <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">BESPAARD / VERDIEND</div>
+                <Quote className="w-8 h-8 text-slate-200 mb-4" />
+                <p className="text-slate-600 mb-8 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <div>
+                  <p className="font-black text-slate-900">{t.author}</p>
+                  <p className="text-sm text-slate-400">{t.location}</p>
+                </div>
               </div>
             </div>
           ))}

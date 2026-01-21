@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
 import { 
   ArrowRight, Phone, Mail, MapPin, Clock, 
@@ -29,7 +28,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
 
       {/* Hero */}
       <section className="pt-32 pb-16 bg-slate-50">

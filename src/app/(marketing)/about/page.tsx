@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { Navigation } from '@/components/layout/navigation'
 import { Footer } from '@/components/layout/footer'
 import {
   ArrowRight, Building2, Users, Heart, Shield, Clock,
@@ -11,7 +10,6 @@ import {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
 
       <main className="pt-24">
         {/* Hero */}

@@ -2,64 +2,90 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { Logo } from '@/components/ui/logo'
 import { 
   Shield, Lock, CheckCircle2, MapPin,
   FileText, Clock, Zap, Thermometer, TrendingUp, Wind,
-  Share2, ChevronRight, ArrowRight, ExternalLink
+  Share2, ChevronRight, ArrowRight, ExternalLink, AlertTriangle
 } from 'lucide-react'
 
-// Mock property data
-const PROPERTY_DATA = {
-  name: 'Villa Zonneweide',
-  address: 'Kavel 12, De Buitenplaats, Almere',
-  type: 'Vrijstaande nieuwbouwwoning',
-  size: '210 m²',
-  plot: '650 m²',
-  rooms: 5,
-  bathrooms: 2,
-  buildYear: '2025-2026',
-  energy: 'A++++',
-  owner: 'Familie Van der Berg',
-  builder: 'Helder Engineering',
-  progress: 75,
-  currentPhase: 'Gevel & Dak',
-  verifiedDocs: 24,
-  totalDocs: 28,
-  blockchainId: '0x7f3a...b2c4',
+interface PropertyData {
+  id: string
+  name: string
+  address: string
+  type: string
+  size: number | null
+  plot: number | null
+  rooms: number | null
+  bathrooms: number
+  buildYear: string
+  energy: string | null
+  owner: string
+  builder: string
+  progress: number
+  currentPhase: string
+  verifiedDocs: number
+  totalDocs: number
+  blockchainId: string | null
+  isDemo?: boolean
 }
 
-const HIGHLIGHTS = [
-  { label: 'Energielabel', value: 'A++++', icon: Zap },
-  { label: 'Isolatie', value: 'Rc 8.0', icon: Thermometer },
-  { label: 'Zonnepanelen', value: '9.6 kWp', icon: TrendingUp },
-  { label: 'Ventilatie', value: 'WTW 95%', icon: Wind },
-]
+interface Document {
+  name: string
+  category: string
+  verified: boolean
+}
 
-const DOCUMENTS = [
-  { name: 'Bouwvergunning', category: 'Vergunningen', verified: true },
-  { name: 'BENG Berekening', category: 'Energie', verified: true },
-  { name: 'Constructieberekening', category: 'Berekeningen', verified: true },
-  { name: 'Materiaalspecificaties', category: 'Materialen', verified: true },
-  { name: 'Garantiecertificaten', category: 'Garanties', verified: true },
-]
+interface TimelineItem {
+  phase: string
+  status: 'completed' | 'current' | 'upcoming'
+  date: string
+  progress?: number
+}
 
-const TIMELINE = [
-  { phase: 'Fundering', status: 'completed', date: 'Sep 2025' },
-  { phase: 'Ruwbouw', status: 'completed', date: 'Nov 2025' },
-  { phase: 'Gevel & Dak', status: 'current', date: 'Jan 2026', progress: 60 },
-  { phase: 'Installaties', status: 'upcoming', date: 'Mrt 2026' },
-  { phase: 'Afbouw', status: 'upcoming', date: 'Mei 2026' },
-  { phase: 'Oplevering', status: 'upcoming', date: 'Jul 2026' },
-]
+interface Highlight {
+  label: string
+  value: string
+}
 
-export default function SharePage({ params }: { params: { token: string } }) {
+const HIGHLIGHT_ICONS = [Zap, Thermometer, TrendingUp, Wind]
+
+export default function SharePage() {
+  const params = useParams()
+  const token = params.token as string
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [propertyData, setPropertyData] = useState<PropertyData | null>(null)
+  const [documents, setDocuments] = useState<Document[]>([])
+  const [timeline, setTimeline] = useState<TimelineItem[]>([])
+  const [highlights, setHighlights] = useState<Highlight[]>([])
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800)
-    return () => clearTimeout(timer)
-  }, [])
+    async function fetchData() {
+      try {
+        const res = await fetch(`/api/share/${token}`)
+        const data = await res.json()
+
+        if (!res.ok) {
+          setError(data.error || 'Failed to load property')
+          return
+        }
+
+        setPropertyData(data.property)
+        setDocuments(data.documents || [])
+        setTimeline(data.timeline || [])
+        setHighlights(data.highlights || [])
+      } catch (err) {
+        setError('Failed to load property data')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [token])
 
   if (isLoading) {
     return (
@@ -67,6 +93,27 @@ export default function SharePage({ params }: { params: { token: string } }) {
         <div className="text-center">
           <div className="w-12 h-12 border-2 border-white border-t-transparent animate-spin mx-auto mb-4" />
           <p className="text-white/50 text-sm font-bold uppercase tracking-wider">Woningpaspoort laden</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !propertyData) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-black text-white mb-2">NIET GEVONDEN</h1>
+          <p className="text-white/50 mb-8">
+            {error || 'Dit woningpaspoort kon niet worden geladen.'}
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#93b9e6] text-slate-900 font-bold uppercase tracking-wider"
+          >
+            Naar homepage
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     )
@@ -108,158 +155,171 @@ export default function SharePage({ params }: { params: { token: string } }) {
             </div>
             
             <h1 className="text-[2.5rem] lg:text-[4rem] font-black text-white leading-[0.9] tracking-tight mb-4">
-              {PROPERTY_DATA.name}
+              {propertyData.name}
             </h1>
             
             <div className="flex items-center gap-2 text-white/40 mb-6">
               <MapPin className="w-4 h-4" />
-              <span className="text-sm font-medium">{PROPERTY_DATA.address}</span>
+              <span className="text-sm font-medium">{propertyData.address}</span>
             </div>
             
             <p className="text-white/50 mb-8">
-              {PROPERTY_DATA.type} • {PROPERTY_DATA.size} woonoppervlakte • {PROPERTY_DATA.plot} kavel
+              {propertyData.type} • {propertyData.size ? `${propertyData.size} m²` : '-'} woonoppervlakte • {propertyData.plot ? `${propertyData.plot} m²` : '-'} kavel
             </p>
 
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-1">
               <div className="bg-white/5 p-4">
                 <span className="text-white/40 text-xs font-bold uppercase tracking-wider">Kamers</span>
-                <p className="text-2xl font-black text-white">{PROPERTY_DATA.rooms}</p>
+                <p className="text-2xl font-black text-white">{propertyData.rooms || '-'}</p>
               </div>
               <div className="bg-white/5 p-4">
                 <span className="text-white/40 text-xs font-bold uppercase tracking-wider">Badkamers</span>
-                <p className="text-2xl font-black text-white">{PROPERTY_DATA.bathrooms}</p>
+                <p className="text-2xl font-black text-white">{propertyData.bathrooms}</p>
               </div>
               <div className="bg-white/5 p-4">
                 <span className="text-white/40 text-xs font-bold uppercase tracking-wider">Bouwjaar</span>
-                <p className="text-2xl font-black text-white">{PROPERTY_DATA.buildYear}</p>
+                <p className="text-2xl font-black text-white">{propertyData.buildYear}</p>
               </div>
             </div>
 
             {/* Blockchain verification */}
-            <div className="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-500/20 flex items-center justify-center">
-                  <Lock className="w-5 h-5 text-emerald-400" />
+            {propertyData.blockchainId && (
+              <div className="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-500/20 flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="text-white font-bold text-sm">Blockchain geverifieerd</p>
+                    <p className="text-white/40 text-xs font-mono">{propertyData.blockchainId}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-white font-bold text-sm">Blockchain geverifieerd</p>
-                  <p className="text-white/40 text-xs font-mono">{PROPERTY_DATA.blockchainId}</p>
+                <div className="text-white/30 text-xs font-bold uppercase tracking-wider">
+                  Verificatie: vandaag
                 </div>
               </div>
-              <div className="text-white/30 text-xs font-bold uppercase tracking-wider">
-                Verificatie: vandaag
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Energy Label */}
           <div className="lg:col-span-4 bg-emerald-500 p-8 lg:p-12 flex flex-col justify-center">
             <p className="text-black/40 text-xs font-black uppercase tracking-wider mb-4">Energielabel</p>
             <div className="text-[5rem] lg:text-[7rem] font-black text-black leading-[0.8] tracking-tight mb-4">
-              {PROPERTY_DATA.energy}
+              {propertyData.energy || '-'}
             </div>
-            <p className="text-black font-bold">Bijna Energieneutraal</p>
-            <p className="text-black/50 text-sm">BENG-compliant</p>
+            <p className="text-black font-bold">{propertyData.energy?.startsWith('A') ? 'Bijna Energieneutraal' : 'Energie Efficiënt'}</p>
+            <p className="text-black/50 text-sm">{propertyData.energy?.includes('+') ? 'BENG-compliant' : ''}</p>
           </div>
         </div>
 
         {/* Energy Highlights */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 mb-12">
-          {HIGHLIGHTS.map((item) => (
-            <div key={item.label} className="bg-white p-6 group hover:bg-slate-900 transition-colors duration-300">
-              <item.icon className="w-8 h-8 text-[#93b9e6] mb-4 group-hover:text-[#93b9e6]" />
-              <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1 group-hover:text-white/40">{item.label}</p>
-              <p className="text-2xl font-black text-[#0a0a0a] group-hover:text-white">{item.value}</p>
-            </div>
-          ))}
+          {highlights.map((item, index) => {
+            const Icon = HIGHLIGHT_ICONS[index] || Zap
+            return (
+              <div key={item.label} className="bg-white p-6 group hover:bg-slate-900 transition-colors duration-300">
+                <Icon className="w-8 h-8 text-[#93b9e6] mb-4 group-hover:text-[#93b9e6]" />
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1 group-hover:text-white/40">{item.label}</p>
+                <p className="text-2xl font-black text-[#0a0a0a] group-hover:text-white">{item.value}</p>
+              </div>
+            )
+          })}
         </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-1 mb-12">
           {/* Documents */}
-          <div className="lg:col-span-2 bg-white">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200">
-              <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-[#0a0a0a]" />
-                <div>
-                  <h2 className="font-black text-[#0a0a0a] uppercase tracking-wider">Documenten</h2>
-                  <p className="text-sm text-slate-500">{PROPERTY_DATA.verifiedDocs} van {PROPERTY_DATA.totalDocs} geverifieerd</p>
-                </div>
-              </div>
-              <div className="px-3 py-1.5 bg-emerald-500 text-white text-sm font-black">
-                {Math.round((PROPERTY_DATA.verifiedDocs / PROPERTY_DATA.totalDocs) * 100)}%
-              </div>
-            </div>
-            
-            <div>
-              {DOCUMENTS.map((doc) => (
-                <div 
-                  key={doc.name}
-                  className="flex items-center gap-4 p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group"
-                >
-                  <FileText className="w-5 h-5 text-slate-400" />
-                  <div className="flex-1">
-                    <p className="font-bold text-[#0a0a0a]">{doc.name}</p>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">{doc.category}</p>
+          {documents.length > 0 && (
+            <div className="lg:col-span-2 bg-white">
+              <div className="flex items-center justify-between p-6 border-b border-slate-200">
+                <div className="flex items-center gap-3">
+                  <FileText className="w-6 h-6 text-[#0a0a0a]" />
+                  <div>
+                    <h2 className="font-black text-[#0a0a0a] uppercase tracking-wider">Documenten</h2>
+                    <p className="text-sm text-slate-500">{propertyData.verifiedDocs} van {propertyData.totalDocs} geverifieerd</p>
                   </div>
-                  {doc.verified && (
-                    <div className="flex items-center gap-1.5 text-emerald-600">
-                      <Lock className="w-4 h-4" />
-                      <span className="text-xs font-bold uppercase tracking-wider">Geverifieerd</span>
-                    </div>
-                  )}
-                  <ChevronRight className="w-5 h-5 text-slate-300" />
                 </div>
-              ))}
-            </div>
-            
-            <div className="p-4 bg-slate-50">
-              <button className="w-full flex items-center justify-center gap-2 py-3 text-sm font-black text-[#0a0a0a] uppercase tracking-wider hover:bg-slate-100 transition-colors">
-                Alle {PROPERTY_DATA.totalDocs} documenten
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Timeline */}
-          <div className="bg-slate-900">
-            <div className="p-6 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <Clock className="w-6 h-6 text-[#93b9e6]" />
-                <div>
-                  <h2 className="font-black text-white uppercase tracking-wider">Bouwtijdlijn</h2>
-                  <p className="text-sm text-white/40">{PROPERTY_DATA.progress}% voltooid</p>
-                </div>
+                {propertyData.totalDocs > 0 && (
+                  <div className="px-3 py-1.5 bg-emerald-500 text-white text-sm font-black">
+                    {Math.round((propertyData.verifiedDocs / propertyData.totalDocs) * 100)}%
+                  </div>
+                )}
               </div>
-            </div>
-            
-            <div className="p-6">
-              <div className="space-y-4">
-                {TIMELINE.map((item) => (
-                  <div key={item.phase} className="flex items-center gap-4">
-                    <div className={`w-3 h-3 ${
-                      item.status === 'completed' ? 'bg-emerald-500' :
-                      item.status === 'current' ? 'bg-[#93b9e6]' :
-                      'bg-white/20'
-                    }`} />
+              
+              <div>
+                {documents.map((doc) => (
+                  <div 
+                    key={doc.name}
+                    className="flex items-center gap-4 p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group"
+                  >
+                    <FileText className="w-5 h-5 text-slate-400" />
                     <div className="flex-1">
-                      <p className={`font-bold text-sm ${
-                        item.status === 'upcoming' ? 'text-white/30' : 'text-white'
-                      }`}>{item.phase}</p>
-                      <p className="text-xs text-white/40">{item.date}</p>
+                      <p className="font-bold text-[#0a0a0a]">{doc.name}</p>
+                      <p className="text-xs text-slate-500 uppercase tracking-wider">{doc.category}</p>
                     </div>
-                    {item.status === 'current' && item.progress && (
-                      <span className="text-sm font-black text-[#93b9e6]">{item.progress}%</span>
+                    {doc.verified && (
+                      <div className="flex items-center gap-1.5 text-emerald-600">
+                        <Lock className="w-4 h-4" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Geverifieerd</span>
+                      </div>
                     )}
-                    {item.status === 'completed' && (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    )}
+                    <ChevronRight className="w-5 h-5 text-slate-300" />
                   </div>
                 ))}
               </div>
+              
+              {propertyData.totalDocs > documents.length && (
+                <div className="p-4 bg-slate-50">
+                  <button className="w-full flex items-center justify-center gap-2 py-3 text-sm font-black text-[#0a0a0a] uppercase tracking-wider hover:bg-slate-100 transition-colors">
+                    Alle {propertyData.totalDocs} documenten
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
+          )}
+
+          {/* Timeline */}
+          {timeline.length > 0 && (
+            <div className={`bg-slate-900 ${documents.length === 0 ? 'lg:col-span-3' : ''}`}>
+              <div className="p-6 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <Clock className="w-6 h-6 text-[#93b9e6]" />
+                  <div>
+                    <h2 className="font-black text-white uppercase tracking-wider">Bouwtijdlijn</h2>
+                    <p className="text-sm text-white/40">{propertyData.progress}% voltooid</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <div className="space-y-4">
+                  {timeline.map((item) => (
+                    <div key={item.phase} className="flex items-center gap-4">
+                      <div className={`w-3 h-3 ${
+                        item.status === 'completed' ? 'bg-emerald-500' :
+                        item.status === 'current' ? 'bg-[#93b9e6]' :
+                        'bg-white/20'
+                      }`} />
+                      <div className="flex-1">
+                        <p className={`font-bold text-sm ${
+                          item.status === 'upcoming' ? 'text-white/30' : 'text-white'
+                        }`}>{item.phase}</p>
+                        <p className="text-xs text-white/40">{item.date}</p>
+                      </div>
+                      {item.status === 'current' && item.progress && (
+                        <span className="text-sm font-black text-[#93b9e6]">{item.progress}%</span>
+                      )}
+                      {item.status === 'completed' && (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Builder & Owner Info */}
@@ -267,26 +327,26 @@ export default function SharePage({ params }: { params: { token: string } }) {
           <div className="bg-white p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-14 h-14 bg-[#0a0a0a] flex items-center justify-center text-white font-black text-xl">
-                HE
+                {propertyData.builder.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()}
               </div>
               <div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">Bouwer</p>
-                <p className="font-black text-[#0a0a0a]">{PROPERTY_DATA.builder}</p>
+                <p className="font-black text-[#0a0a0a]">{propertyData.builder}</p>
               </div>
             </div>
             <p className="text-slate-600 text-sm">
-              Sinds 1956 specialist in hoogwaardige nieuwbouw met focus op duurzaamheid en kwaliteit.
+              Specialist in hoogwaardige nieuwbouw met focus op duurzaamheid en kwaliteit.
             </p>
           </div>
           
           <div className="bg-white p-6">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-14 h-14 bg-[#93b9e6] flex items-center justify-center text-[#0a0a0a] font-black text-xl">
-                FV
+                {propertyData.owner.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()}
               </div>
               <div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">Eigenaar</p>
-                <p className="font-black text-[#0a0a0a]">{PROPERTY_DATA.owner}</p>
+                <p className="font-black text-[#0a0a0a]">{propertyData.owner}</p>
               </div>
             </div>
             <p className="text-slate-600 text-sm">
