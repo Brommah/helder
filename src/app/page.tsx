@@ -477,7 +477,7 @@ function ProcessSection() {
                   style={{ backgroundImage: `url(${step.bg})` }}
                 />
                 <div className="relative z-10">
-                  <div className="text-6xl lg:text-8xl font-black text-slate-100 group-hover:text-[#93b9e6]/20 transition-colors mb-6">{step.num}</div>
+                  <div className="text-6xl lg:text-8xl font-black text-[#6B9FD4] group-hover:text-[#93b9e6] transition-colors mb-6">{step.num}</div>
                   <Icon className="w-8 h-8 text-[#93b9e6] mb-6" />
                   <h3 className="text-lg font-black text-slate-900 mb-4 tracking-wider">{step.title}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed">{step.desc}</p>
